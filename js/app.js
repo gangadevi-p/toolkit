@@ -225,7 +225,7 @@
     });
     var name = D.SECTIONS.filter(function (s) { return s.id === id; })[0].name;
     $("menubar-page").textContent = name;
-    document.title = name + " · Design Tool-kit";
+    document.title = name + " · Toolkit";
     if (location.hash !== "#" + id) { history.replaceState(null, "", "#" + id); }
     try { localStorage.setItem("designSystemSection", id); } catch (err) {}
     applyFilter();
