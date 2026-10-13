@@ -1067,6 +1067,23 @@
     } catch (err) { return null; }
   }
 
+  /* Pulls every http(s):// or www. address out of free text. Returns the text without them, plus the links. */
+  function extractUrls(raw) {
+    var links = [];
+    var text = String(raw || "").replace(/(?:https?:\/\/|www\.)[^\s<>"']+/gi, function (match) {
+      var trail = (match.match(/[.,;:!?)\]}]+$/) || [""])[0];
+      var clean = normalizeLink(trail ? match.slice(0, -trail.length) : match);
+      if (!clean) return match;
+      if (links.indexOf(clean) === -1) links.push(clean);
+      return trail;
+    });
+    return { text: text.replace(/[ \t]{2,}/g, " ").replace(/ +([.,;:!?])/g, "$1").replace(/\n{3,}/g, "\n\n").trim(), links: links };
+  }
+
+  function mergeLinks(into, more) {
+    more.forEach(function (href) { if (into.indexOf(href) === -1) into.push(href); });
+  }
+
   function linkLabel(href) {
     var url = new URL(href);
     return (url.host + url.pathname + url.search).replace(/\/$/, "");
@@ -1102,6 +1119,17 @@
         it.note = "";
         cleaned = true;
       }
+    });
+    /* A link typed into the note or title used to stay plain text; turn it into a real link. */
+    saved.forEach(function (it) {
+      var fromNote = extractUrls(it.note);
+      var fromTitle = extractUrls(it.title);
+      if (!fromNote.links.length && !fromTitle.links.length) return;
+      mergeLinks(it.links, fromTitle.links);
+      mergeLinks(it.links, fromNote.links);
+      it.note = fromNote.text;
+      it.title = fromTitle.text || linkLabel((fromTitle.links.concat(fromNote.links))[0]);
+      cleaned = true;
     });
     if (cleaned) persistSaved();
   }
@@ -1166,7 +1194,7 @@
         '<button type="button" data-saved-filter="all" aria-pressed="true">All · 0</button></nav></div>' +
         '<div class="saved-empty">' + I.bookmark +
         '<strong>Nothing saved yet</strong>' +
-        '<span>Found something worth keeping? Add it from <em>Save here</em> in the sidebar.</span>' +
+        '<span>Found something worth keeping? Add it with the <em>+</em> beside Saved at the top.</span>' +
         '<button class="btn btn--primary btn--sm" type="button" data-saved-add>' + I.plus + 'Save here</button></div>';
     } else {
       html = '<div class="saved-bar"><nav class="filter-bar saved-filters" aria-label="Saved filters">' +
@@ -1226,6 +1254,7 @@
   function resetSaveForm() {
     $("save-form").reset();
     clearFieldError("save-title");
+    clearFieldError("save-link");
     clearFieldError("save-new");
   }
 
@@ -1254,13 +1283,25 @@
   }
 
   function submitSave() {
-    var title = $("save-title").value.trim();
+    /* Any web address in the title or note becomes a real link, so nothing has to be copied and pasted. */
+    var fromTitle = extractUrls($("save-title").value);
+    var fromNote = extractUrls($("save-note").value);
+    var linkField = $("save-link").value.trim();
+    var fieldLink = normalizeLink(linkField);
+    var links = [];
+    if (fieldLink) links.push(fieldLink);
+    mergeLinks(links, fromTitle.links);
+    mergeLinks(links, fromNote.links);
+    var title = (fromTitle.text || (links.length ? linkLabel(links[0]) : "")).slice(0, 80).trim();
+    var note = fromNote.text.slice(0, 500).trim();
+    var badLink = linkField !== "" && fieldLink === null;
     var creating = $("save-category").value === NEW_CATEGORY;
     var newName = creating ? $("save-new").value.trim().replace(/\s+/g, " ") : "";
     /* Flag every problem; the last one flagged takes focus, so go bottom-up to land on the first in reading order. */
     if (creating && !newName) setFieldError("save-new");
+    if (badLink) setFieldError("save-link");
     if (!title) setFieldError("save-title");
-    if (!title || (creating && !newName)) return;
+    if (!title || badLink || (creating && !newName)) return;
 
     var category = creating ? addCategory(newName) : $("save-category").value;
     lastCategory = category;
@@ -1268,7 +1309,8 @@
     if (editing) {
       editing.title = title;
       editing.category = category;
-      editing.note = $("save-note").value.trim();
+      editing.note = note;
+      mergeLinks(editing.links, links);
       /* Keep the item in view: if its tab changed, follow it there. */
       if (savedFilter !== "all") savedFilter = category;
     } else {
@@ -1276,8 +1318,8 @@
         id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
         title: title,
         category: category,
-        links: [],
-        note: $("save-note").value.trim(),
+        links: links,
+        note: note,
         savedAt: new Date().toISOString()
       });
     }
@@ -1332,7 +1374,7 @@
   });
 
   document.addEventListener("input", function (e) {
-    if (e.target.id === "save-title" || e.target.id === "save-new") clearFieldError(e.target.id);
+    if (e.target.id === "save-title" || e.target.id === "save-link" || e.target.id === "save-new") clearFieldError(e.target.id);
     if (e.target.classList.contains("saved-link-input")) {
       e.target.removeAttribute("aria-invalid");
       e.target.closest("form").querySelector(".saved-link-help").hidden = true;

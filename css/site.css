@@ -58,18 +58,6 @@ body{background:var(--bg);}
 .nav-link-count:empty{display:none;}
 .nav-link[aria-current="page"] .nav-link-count{background:color-mix(in srgb,var(--on-accent) 24%,transparent);color:var(--on-accent);}
 
-/* ---------- save here ---------- */
-.save{margin-top:auto;padding-top:20px;border-top:var(--border-width) solid var(--border);}
-.save-toggle{
-  display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:var(--control-md);padding:0 12px;
-  border:0;border-radius:var(--radius-md);background:var(--accent);color:var(--on-accent);
-  font-size:var(--label-size);font-weight:var(--weight-semibold);cursor:pointer;
-  transition:background-color var(--duration-instant) var(--ease-standard);
-}
-.save-toggle svg{width:var(--icon-sm);height:var(--icon-sm);flex:none;}
-.save-toggle:hover{background:var(--accent-hover);}
-.save-toggle:focus-visible{outline:var(--border-width-strong) solid var(--focus-ring);outline-offset:2px;}
-
 /* ---------- save popup ---------- */
 .save-dialog{
   width:min(420px,calc(100vw - 32px));max-height:calc(100dvh - 32px);margin:auto;padding:24px;overflow-y:auto;
@@ -190,7 +178,7 @@ body{background:var(--bg);}
 /* ---------- touch: 44px targets wherever the drawer layout is used ---------- */
 @media (max-width:960px){
   .menu-trigger,.back-trigger,.sidebar-close{width:var(--touch-min);height:var(--touch-min);}
-  .save-toggle,.nav-link{height:var(--touch-min);}
+  .nav-link{height:var(--touch-min);}
   .filter-bar button{height:var(--touch-min);}
   .saved-bar .btn{height:var(--touch-min);}
   .saved-card .saved-card-actions{margin:-8px -10px -8px 0;}
@@ -693,9 +681,6 @@ body{background:var(--bg);}
 .nav-link[aria-current="page"]:hover{background:var(--surface);color:var(--text);}
 .nav-link[aria-current="page"] .nav-link-count{background:var(--fill);color:var(--text-secondary);}
 
-.save{padding-top:0;border-top:0;}
-.save-toggle{height:44px;border-radius:12px;}
-
 /* ---------- page header: a large title and one plain sentence ---------- */
 .main{padding:40px 64px 128px;}
 .page{max-width:1080px;}
@@ -774,7 +759,7 @@ body{background:var(--bg);}
 .topbar-page{font-size:var(--body-lg-size);font-weight:var(--weight-semibold);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
 .search{
-  position:relative;display:flex;align-items:center;gap:8px;flex:1;min-width:0;height:40px;padding:0 12px;
+  position:relative;display:flex;align-items:center;gap:8px;flex:0 1 240px;min-width:0;margin-left:auto;height:40px;padding:0 12px;
   border-radius:12px;background:var(--fill);color:var(--text-tertiary);cursor:text;
   transition:background-color var(--duration-fast) var(--ease-standard),box-shadow var(--duration-fast) var(--ease-standard);
 }
@@ -788,12 +773,14 @@ body{background:var(--bg);}
 .search input::placeholder{color:var(--text-tertiary);}
 
 @media (max-width:960px){
-  .topbar-inner{justify-content:flex-start;max-width:none;padding:10px 16px;padding-top:calc(10px + env(safe-area-inset-top,0px));}
+  /* 20px sides, the same as the page below, so the bar lines up with the content */
+  .topbar-inner{justify-content:flex-start;max-width:none;padding:10px 20px;padding-top:calc(10px + env(safe-area-inset-top,0px));}
   .menu-trigger{display:grid;}
-  .topbar-title{display:flex;}
-  .search{flex:1;width:auto;min-width:0;height:var(--touch-min);}
+  .topbar-title{display:flex;flex:0 0 auto;max-width:38%;}
+  .search{width:auto;min-width:0;height:var(--touch-min);}
   /* typing gives the field the whole bar */
   .topbar-inner:has(.search input:focus) .topbar-title{display:none;}
+  .topbar-inner:has(.search input:focus) .search{flex:1;}
   .main{padding-top:28px;}
 }
 .sidebar{scrollbar-width:none;}
@@ -818,14 +805,11 @@ body{background:var(--bg);}
   font-size:var(--overline-size);line-height:var(--overline-line);font-weight:var(--weight-bold);
   letter-spacing:.08em;text-transform:uppercase;color:var(--text);
 }
-/* desktop: a little tighter so all three groups and Save here fit a laptop screen without scrolling */
+/* desktop: a little tighter so all three groups fit a laptop screen without scrolling */
 @media (min-width:961px){
   .nav{gap:20px;}
   .nav-link{height:36px;}
 }
-/* Save here stays in view even when the list is taller than the window */
-.sidebar{padding-bottom:0;}
-.save{position:sticky;bottom:0;margin-top:auto;padding:12px 0 20px;background:var(--bg);}
 @media (min-width:961px){
   .nav-link{height:34px;}
 }
@@ -850,6 +834,20 @@ body{background:var(--bg);}
   .topbar-inner:has(.search input:focus) .topbar-saved{display:none;}
 }
 
+/* ---------- Save here: a plus beside Saved ---------- */
+.topbar-add{
+  display:inline-flex;align-items:center;justify-content:center;flex:none;width:40px;height:40px;padding:0;
+  border:0;border-radius:12px;background:var(--accent);color:var(--on-accent);cursor:pointer;
+  transition:background-color var(--duration-fast) var(--ease-standard);
+}
+.topbar-add svg{width:var(--icon-md);height:var(--icon-md);flex:none;}
+.topbar-add:hover{background:var(--accent-hover);}
+.topbar-add:focus-visible{outline:var(--border-width-strong) solid var(--focus-ring);outline-offset:2px;}
+@media (max-width:960px){
+  .topbar-add{width:var(--touch-min);height:var(--touch-min);}
+  .topbar-inner:has(.search input:focus) .topbar-add{display:none;}
+}
+
 /* ============================================================
    Header layout: one bar across the top, the sidebar always below it.
    Logo, search and Saved sit together in the middle of the bar.
@@ -858,7 +856,14 @@ body{background:var(--bg);}
 .topbar-brand{display:none;}
 .topbar-inner{width:100%;}
 @media (min-width:961px){
-  .shell{grid-template-rows:auto 1fr;}
+  /* The bar's content box is the page's: the sidebar, then the main padding (64px), then the 1080px page, centred. */
+  :root{--sidebar-w:180px;}
+  .shell{grid-template-columns:var(--sidebar-w) minmax(0,1fr);grid-template-rows:auto 1fr;}
+  .topbar-inner{
+    --gutter:max(0px,calc((100% - var(--sidebar-w) - 128px - 1080px) / 2));
+    max-width:none;margin:0;justify-content:flex-start;
+    padding-left:calc(var(--sidebar-w) + 64px + var(--gutter));padding-right:calc(64px + var(--gutter));
+  }
   .topbar{grid-column:1 / -1;grid-row:1;}
   .sidebar{grid-column:1;grid-row:2;top:var(--topbar-h);height:calc(100vh - var(--topbar-h));height:calc(100dvh - var(--topbar-h));padding-top:20px;}
   .main{grid-column:2;grid-row:2;min-width:0;}

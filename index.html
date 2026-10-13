@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="css/base.css?v=142d55fd">
   <link rel="stylesheet" href="css/buttons.css?v=b035f32a">
   <link rel="stylesheet" href="css/components.css?v=168e7809">
-  <link rel="stylesheet" href="css/site.css?v=b99c023f">
+  <link rel="stylesheet" href="css/site.css?v=c3a7dddc">
 </head>
 <body>
   <div class="shell">
@@ -39,6 +39,9 @@
           <span class="topbar-saved-label">Saved</span>
           <span class="nav-link-count" id="saved-count"></span>
         </button>
+        <button class="topbar-add" id="save-open" type="button" aria-haspopup="dialog" aria-label="Save here" title="Save here">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
       </div>
     </header>
 
@@ -56,13 +59,6 @@
       </div>
 
       <nav class="nav" id="nav" aria-label="Sections"></nav>
-
-      <div class="save">
-        <button class="save-toggle" id="save-open" type="button" aria-haspopup="dialog">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h10v16l-5-4-5 4z"/></svg>
-          <span>Save here</span>
-        </button>
-      </div>
     </aside>
     <div class="scrim" id="scrim"></div>
 
@@ -76,8 +72,13 @@
         </div>
         <div class="field" id="save-title-field">
           <label class="field-label" for="save-title">Title</label>
-          <input class="input" id="save-title" name="title" type="text" maxlength="80" placeholder="Name what you found" autocomplete="off" required aria-describedby="save-title-help">
+          <input class="input" id="save-title" name="title" type="text" placeholder="Name what you found" autocomplete="off" required aria-describedby="save-title-help">
           <span class="field-help" id="save-title-help" hidden>Add a title to save this.</span>
+        </div>
+        <div class="field" id="save-link-field">
+          <label class="field-label" for="save-link">Link</label>
+          <input class="input" id="save-link" name="link" type="text" inputmode="url" maxlength="2000" placeholder="Paste a link" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="save-link-help">
+          <span class="field-help" id="save-link-help" hidden>Enter a valid web link, like https://example.com.</span>
         </div>
         <div class="field">
           <label class="field-label" for="save-category">Category</label>
@@ -93,7 +94,7 @@
         </div>
         <div class="field">
           <label class="field-label" for="save-note">Note</label>
-          <textarea class="input input--textarea" id="save-note" name="note" rows="3" maxlength="500" placeholder="Why is it worth saving?"></textarea>
+          <textarea class="input input--textarea" id="save-note" name="note" rows="3" placeholder="Why is it worth saving?"></textarea>
         </div>
         <p class="save-privacy">Stays in this browser only. Nobody else can see what you save.</p>
         <div class="dialog-actions">
@@ -108,6 +109,6 @@
   </div>
 
   <script src="js/data.js?v=414a8e56"></script>
-  <script src="js/app.js?v=dda1a291"></script>
+  <script src="js/app.js?v=384bf75f"></script>
 </body>
 </html>
