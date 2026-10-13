@@ -787,3 +787,8 @@ body{background:var(--bg);}
 }
 .sidebar{scrollbar-width:none;}
 .sidebar::-webkit-scrollbar{display:none;}
+
+/* ---------- sidebar icons ---------- */
+.nav-link-main{display:flex;align-items:center;gap:12px;min-width:0;}
+.nav-link-main svg{width:var(--icon-md);height:var(--icon-md);flex:none;color:var(--text-tertiary);transition:color var(--duration-fast) var(--ease-standard);}
+.nav-link:hover .nav-link-main svg,.nav-link[aria-current="page"] .nav-link-main svg{color:var(--text);}

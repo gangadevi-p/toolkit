@@ -154,7 +154,7 @@
       return '<div class="nav-group"><span class="nav-label">' + g.name + '</span>' +
         g.items.map(function (s) {
           return '<button class="nav-link" type="button" data-section="' + s.id + '">' +
-            '<span>' + s.name + '</span>' +
+            '<span class="nav-link-main">' + (I[s.icon] || "") + '<span>' + s.name + '</span></span>' +
             (s.id === "saved" ? '<span class="nav-link-count" id="saved-count"></span>' : "") + '</button>';
         }).join("") + '</div>';
     }).join("");
