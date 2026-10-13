@@ -63,7 +63,7 @@
   --body-size:14px;     --body-line:22px;
   --label-size:13px;    --label-line:18px;
   --caption-size:12px;  --caption-line:16px;
-  --overline-size:11px; --overline-line:16px;
+  --overline-size:12px; --overline-line:16px;
 
   /* ---------- spacing ---------- */
   --space-1:4px;
@@ -145,7 +145,7 @@
 [data-theme="light"]{
   color-scheme:light;
 
-  --bg:var(--neutral-200);
+  --bg:var(--neutral-100);
   --nav-bg:#ffffff;
   --surface:var(--neutral-0);
   --surface-sunken:var(--neutral-100);

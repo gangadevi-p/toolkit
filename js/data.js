@@ -42,21 +42,29 @@
   /* ================= SECTIONS ================= */
   var SECTIONS = [
     { id: "components", group: "Sections", name: "Components",
-      intro: "Basic styles and states. All in one place." },
+      intro: "The essentials, with their states and sizes." },
     { id: "animations", group: "Sections", name: "Animations",
-      intro: "Auto-playing UI motion patterns." },
+      intro: "Twelve motions that cover most interfaces." },
     { id: "buttons", group: "Sections", name: "Buttons",
-      intro: "Variants, states and sizes." },
+      intro: "Six types, three sizes, seven states." },
     { id: "colors", group: "Sections", name: "Colors",
-      intro: "Black, white and grey only: a mono accent, a neutral scale, status tones and contrast." },
+      intro: "Black, white and grey. Nothing else." },
     { id: "typography", group: "Sections", name: "Typography",
-      intro: "Type scale, weights and responsive sizes." },
+      intro: "One typeface. Ten styles." },
     { id: "variables", group: "Sections", name: "Variables",
-      intro: "Reusable tokens for light and dark, including motion." },
+      intro: "Every value, ready to use as a Figma variable." },
     { id: "principles", group: "Sections", name: "Principles",
-      intro: "UX, UI and design principles." },
+      intro: "What good design asks of you." },
+    { id: "heuristics", group: "Sections", name: "Heuristics",
+      intro: "Ten rules to judge any interface." },
+    { id: "research", group: "Sections", name: "Research",
+      intro: "Eight ways to learn from people." },
+    { id: "patterns", group: "Sections", name: "Patterns",
+      intro: "Eight screens almost every product needs." },
+    { id: "product", group: "Sections", name: "Product",
+      intro: "What to build first, and how to know it worked." },
     { id: "saved", group: "Sections", name: "Saved",
-      intro: "Everything you saved from the sidebar." }
+      intro: "Your notes. Kept on this device only." }
   ];
 
   /* ================= TYPOGRAPHY ================= */
@@ -90,7 +98,7 @@
       use: "Buttons, tabs, form labels, menu items.", sample: "Save changes" },
     { name: "Caption", weight: 500, tracking: 0, web: [12, 16], mobile: [13, 18],
       use: "Helper text, metadata, timestamps.", sample: "Edited 2 minutes ago" },
-    { name: "Overline", weight: 600, tracking: 8, upper: true, web: [11, 16], mobile: [12, 16],
+    { name: "Overline", weight: 600, tracking: 8, upper: true, web: [12, 16], mobile: [12, 16],
       use: "Eyebrows above headings, small section labels.", sample: "Foundations" }
   ];
 
@@ -138,16 +146,6 @@
     { step: 1000, name: "Black", hex: "#000000" }
   ];
 
-  var ACCENT_USES = [
-    { name: "Fill", variable: "accent/default", demo: "fill", note: "Primary buttons, checked controls, progress." },
-    { name: "Hover", variable: "accent/hover", demo: "hover", note: "One step darker in light mode, one step lighter in dark." },
-    { name: "Pressed", variable: "accent/pressed", demo: "pressed", note: "Two steps from default, only while held." },
-    { name: "Tint", variable: "accent/tint", demo: "tint", note: "Selected chips, rows and toggles. A background, never text." },
-    { name: "Text & links", variable: "accent/text", demo: "text", note: "A darker step than the fill so text passes contrast." },
-    { name: "Focus ring", variable: "focus/ring", demo: "focus", note: "2px outline, 2px away. Keyboard focus only." },
-    { name: "On accent", variable: "text/on-accent", demo: "on", note: "Text and icons placed on an accent fill." }
-  ];
-
   var STATUS = [
     { name: "Success", light: "#262626", dark: "#D1D1D1", badge: "success", icon: "checkCircle",
       use: "Completed actions, valid input, positive change. Told apart by its icon and label, since the palette has no hue." },
@@ -159,11 +157,9 @@
 
   // [label, css colour] per mode
   var COLOR_VARIABLES = [
-    { name: "bg/page", light: ["Light gray", "#E5E5E5"], dark: ["Near black", "#0A0A0A"], use: "Page background" },
+    { name: "bg/page", light: ["Pale gray", "#F3F3F3"], dark: ["Near black", "#0A0A0A"], use: "Page background" },
     { name: "bg/surface", light: ["White", "#FFFFFF"], dark: ["Ink", "#171717"], use: "Cards, inputs, menus" },
     { name: "bg/sunken", light: ["Pale gray", "#F3F3F3"], dark: ["Black", "#000000"], use: "Wells and tracks inside a surface" },
-    { name: "bg/hover", light: ["Light gray", "#E5E5E5"], dark: ["Deep charcoal", "#262626"], use: "Hover fill on neutral controls" },
-    { name: "bg/pressed", light: ["Soft gray", "#D1D1D1"], dark: ["Charcoal", "#404040"], use: "Pressed fill on neutral controls" },
     { name: "text/primary", light: ["Near black", "#0A0A0A"], dark: ["Cloud", "#FAFAFA"], use: "Headings and body" },
     { name: "text/secondary", light: ["Charcoal", "#404040"], dark: ["Soft gray", "#D1D1D1"], use: "Supporting text" },
     { name: "text/tertiary", light: ["Dark gray", "#525252"], dark: ["Mid gray", "#A3A3A3"], use: "Captions and placeholders" },
@@ -171,21 +167,12 @@
     { name: "border/default", light: ["Black · 20% opacity", "rgba(0,0,0,.20)"], dark: ["White · 18% opacity", "rgba(255,255,255,.18)"], use: "Card edges and dividers" },
     { name: "border/strong", light: ["Black · 46% opacity", "rgba(0,0,0,.46)"], dark: ["White · 42% opacity", "rgba(255,255,255,.42)"], use: "Input and button outlines" },
     { name: "accent/default", light: ["Mono 900", "#171717"], dark: ["Mono 100", "#F3F3F3"], use: "The primary action" },
-    { name: "accent/hover", light: ["Mono 800", "#262626"], dark: ["White", "#FFFFFF"], use: "Action while hovered" },
-    { name: "accent/pressed", light: ["Mono 950", "#0A0A0A"], dark: ["Mono 300", "#D1D1D1"], use: "Action while pressed" },
     { name: "accent/tint", light: ["Mono 200", "#E5E5E5"], dark: ["White · 14% opacity", "rgba(255,255,255,.14)"], use: "Selected backgrounds" },
-    { name: "accent/tint-strong", light: ["Mono 300", "#D1D1D1"], dark: ["White · 24% opacity", "rgba(255,255,255,.24)"], use: "Pressed selected backgrounds" },
     { name: "accent/text", light: ["Mono 900", "#171717"], dark: ["Mono 100", "#F3F3F3"], use: "Links and action labels" },
     { name: "focus/ring", light: ["Mono 900", "#171717"], dark: ["Mono 300", "#D1D1D1"], use: "Keyboard focus outline" },
     { name: "status/success", light: ["Deep charcoal", "#262626"], dark: ["Soft gray", "#D1D1D1"], use: "Success text, icons and fills — paired with a check icon" },
     { name: "status/warning", light: ["Dark gray", "#525252"], dark: ["Mid gray", "#A3A3A3"], use: "Warning text, icons and fills — paired with a warning icon" },
-    { name: "status/danger", light: ["Charcoal", "#404040"], dark: ["Mid gray", "#A3A3A3"], use: "Error text, icons and danger buttons" },
-    { name: "status/danger-hover", light: ["Deep charcoal", "#262626"], dark: ["Soft gray", "#D1D1D1"], use: "Danger button while hovered" },
-    { name: "state/disabled-bg", light: ["Light gray", "#E5E5E5"], dark: ["Deep charcoal", "#262626"], use: "Disabled fills" },
-    { name: "state/disabled-text", light: ["Mid gray", "#A3A3A3"], dark: ["Dark gray", "#525252"], use: "Disabled text and icons" },
-    { name: "inverse/surface", light: ["Ink", "#171717"], dark: ["Pale gray", "#F3F3F3"], use: "Toasts and tooltips" },
-    { name: "inverse/text", light: ["Pale gray", "#F3F3F3"], dark: ["Ink", "#171717"], use: "Text on inverse surfaces" },
-    { name: "overlay/scrim", light: ["Black · 48% opacity", "rgba(0,0,0,.48)"], dark: ["Black · 60% opacity", "rgba(0,0,0,.60)"], use: "Behind dialogs and sheets" }
+    { name: "status/danger", light: ["Charcoal", "#404040"], dark: ["Mid gray", "#A3A3A3"], use: "Error text, icons and danger buttons" }
   ];
 
   // Checked against the surface they actually sit on.
@@ -205,23 +192,16 @@
     { id: "spacing", name: "Spacing", unit: "px", desc: "A 4px base. Most layouts only need 8, 16, 24 and 32.", rows: [
       ["space/1", 4, "Icon to label, tight inline gaps"],
       ["space/2", 8, "Gaps inside controls and between related items"],
-      ["space/3", 12, "Padding in compact components"],
       ["space/4", 16, "Default component padding, mobile margins"],
-      ["space/5", 20, "Card padding"],
       ["space/6", 24, "Gaps between cards, tablet margins"],
       ["space/8", 32, "Section spacing within a page, desktop margins"],
-      ["space/10", 40, "Between page sections"],
       ["space/12", 48, "Large section breaks"],
-      ["space/16", 64, "Hero and page-level spacing"]
     ] },
     { id: "radius", name: "Radius", unit: "px", desc: "Corners grow with the size of the thing they round.", rows: [
-      ["radius/none", 0, "Tables and full-bleed media"],
       ["radius/xs", 4, "Checkboxes and small tags"],
-      ["radius/sm", 6, "Small buttons and tooltips"],
       ["radius/md", 8, "Buttons, inputs and menus"],
       ["radius/lg", 12, "Cards and large buttons"],
       ["radius/xl", 16, "Dialogs and popovers"],
-      ["radius/2xl", 24, "Bottom sheets and hero media"],
       ["radius/full", 999, "Pills, avatars and switches"]
     ] },
     { id: "sizing", name: "Sizing", unit: "px", desc: "Control heights sit on an 8px rhythm. Icons come in four sizes.", rows: [
@@ -229,49 +209,28 @@
       ["size/control-md", 40, "Default buttons, inputs and tabs"],
       ["size/control-lg", 48, "Large buttons — the default on touch screens"],
       ["size/touch-min", 44, "Smallest tap area on mobile, even when the visual is smaller"],
-      ["size/icon-xs", 14, "Icons in small buttons and chips"],
       ["size/icon-sm", 16, "Icons in default buttons and inputs"],
-      ["size/icon-md", 20, "Icons in large buttons, alerts and lists"],
       ["size/icon-lg", 24, "Navigation and standalone icons"]
     ] },
     { id: "border", name: "Border", unit: "px", desc: "One weight for edges, a heavier one for focus and selection.", rows: [
       ["border/width", 1, "All outlines and dividers"],
       ["border/width-strong", 2, "Focus rings and the selected-tab indicator"],
-      ["border/focus-offset", 2, "Gap between an element and its focus ring"]
     ] },
     { id: "elevation", name: "Elevation", desc: "Shadows get larger and softer as a surface rises.", rows: [
       ["elevation/0", "None", "Flat — part of the page", 0],
       ["elevation/1", "Y 1 · Blur 2 · 8%", "Cards at rest", 1],
-      ["elevation/2", "Y 2 · Blur 6 · 8%", "Raised cards and sticky headers", 2],
       ["elevation/3", "Y 8 · Blur 20 · 10%", "Menus, popovers and toasts", 3],
       ["elevation/4", "Y 20 · Blur 48 · 16%", "Dialogs and sheets", 4]
     ] },
-    { id: "opacity", name: "Opacity", unit: "%", desc: "For overlays and disabled imagery. Text never uses opacity — use a colour variable instead.", rows: [
-      ["opacity/hover", 8, "Dark overlay on images and coloured fills when hovered"],
-      ["opacity/pressed", 12, "Dark overlay while pressed"],
-      ["opacity/disabled", 40, "Icons and images inside disabled controls"],
-      ["opacity/scrim", 48, "Backdrop behind dialogs in light mode"]
-    ] },
     { id: "duration", name: "Duration", unit: "ms", desc: "Smaller things move faster. Nothing in the interface takes longer than 600ms.", rows: [
-      ["duration/instant", 100, "Colour and opacity changes on hover"],
       ["duration/fast", 150, "Tooltips, checkboxes, switches"],
       ["duration/base", 250, "Menus, tabs, cards — most transitions"],
       ["duration/slow", 400, "Dialogs, drawers and sheets"],
-      ["duration/slower", 600, "Full-screen and page transitions"]
     ] },
     { id: "easing", name: "Easing", desc: "Five curves cover every transition. Values paste straight into a custom bezier field.", easing: true, rows: [
       ["easing/standard", [0.2, 0, 0, 1], "Elements moving within the screen"],
       ["easing/enter", [0.05, 0.7, 0.1, 1], "Elements arriving — decelerate into place"],
       ["easing/exit", [0.3, 0, 0.8, 0.15], "Elements leaving — accelerate away"],
-      ["easing/spring", [0.34, 1.56, 0.64, 1], "Playful confirmations; overshoots then settles"],
-      ["easing/linear", [0, 0, 1, 1], "Spinners, progress bars and loops only"]
-    ] },
-    { id: "type", name: "Typography", desc: "Styles live on the Typography page; these are the values they are built from.", rows: [
-      ["font/family", "Poppins", "Every style on every platform", 400],
-      ["font/weight/regular", "400", "Body Large, Body", 400],
-      ["font/weight/medium", "500", "Caption", 500],
-      ["font/weight/semibold", "600", "Heading 2, Heading 3, Title, Label, Overline", 600],
-      ["font/weight/bold", "700", "Display, Heading 1", 700]
     ] },
     { id: "breakpoints", name: "Breakpoints & grid", desc: "Layouts switch at these widths. Mobile type styles apply below 640px.", grid: true, rows: [
       ["breakpoint/mobile", "0 – 639", "4 columns · 16 margin · 16 gutter", 4],
@@ -307,21 +266,6 @@
     { id: "loading", name: "Loading", cls: "is-loading" }
   ];
 
-  var STATE_RULES = [
-    { name: "Hover", timing: "Variant",
-      rule: "Fill moves one step — accent/hover on accent buttons, bg/hover on neutral ones." },
-    { name: "Pressed", timing: "Variant",
-      rule: "Fill moves two steps — accent/pressed or bg/pressed — and the button drops 1px while held." },
-    { name: "Focused", timing: "Variant",
-      rule: "A 2px focus/ring outline, 2px outside the button. Keyboard only, never on click." },
-    { name: "Selected", timing: "Variant",
-      rule: "For toggles and groups. Neutral buttons take accent/tint with an accent border and label; filled buttons stay pressed; outline fills in." },
-    { name: "Disabled", timing: "Static variant",
-      rule: "state/disabled-bg fill and state/disabled-text label, no border, no hover. Say why nearby when you can." },
-    { name: "Loading", timing: "Static variant",
-      rule: "A progress indicator replaces the label and icon. The button keeps its width and ignores taps." }
-  ];
-
   var BUTTON_SIZES = [
     { id: "sm", name: "Small", cls: "btn--sm", height: 32, padding: 12, radius: 6, label: "Caption · SemiBold", icon: 14, gap: 6,
       use: "Tables, toolbars and dense cards." },
@@ -331,15 +275,136 @@
       use: "Hero actions, and the default size on touch screens." }
   ];
 
-  var ANATOMY = [
-    { part: "Container", desc: "Fill, 1px border and radius. Height comes from the size, never from the label." },
-    { part: "Leading icon", desc: "Optional. Names what the action creates or affects." },
-    { part: "Label", desc: "Label style, SemiBold. A verb, two words at most." },
-    { part: "Trailing icon", desc: "Optional. An arrow for forward navigation or a chevron for menus." },
-    { part: "Focus ring", desc: "2px, 2px away. Appears only for keyboard focus." }
+  /* ================= REFERENCE: HEURISTICS, RESEARCH, PATTERNS, PRODUCT ================= */
+  var HEURISTICS = [
+    { n: "01", name: "Visibility of system status", tags: "clarity",
+      text: "Always tell people what is happening, with feedback that arrives in time.",
+      does: "Show upload progress, “Saved just now” and a selected state." },
+    { n: "02", name: "Match the real world", tags: "clarity",
+      text: "Use the words, order and ideas people already know, not internal terms.",
+      does: "“Shopping bag”, “Trash”, “Sign in”." },
+    { n: "03", name: "User control and freedom", tags: "control",
+      text: "Give people a clearly marked way out of a mistake: undo, cancel, back.",
+      does: "An Undo toast after deleting, and a Back step in every flow." },
+    { n: "04", name: "Consistency and standards", tags: "clarity",
+      text: "The same word and the same action should mean the same thing everywhere.",
+      does: "One icon and one label for Save across the whole product." },
+    { n: "05", name: "Error prevention", tags: "control",
+      text: "Remove the conditions that cause mistakes, or ask before they become expensive.",
+      does: "Date pickers, input masks, and a confirm step for irreversible actions." },
+    { n: "06", name: "Recognition over recall", tags: "clarity",
+      text: "Put options in view so people don’t have to remember them between screens.",
+      does: "Recent searches, visible labels, and defaults from earlier answers." },
+    { n: "07", name: "Flexibility and efficiency", tags: "control",
+      text: "Keep it simple for beginners and give frequent users faster paths.",
+      does: "Keyboard shortcuts, bulk actions, saved filters and templates." },
+    { n: "08", name: "Aesthetic and minimal design", tags: "clarity",
+      text: "Every extra element competes with the one that matters. Show what is needed now.",
+      does: "One primary action per screen and detail revealed on demand." },
+    { n: "09", name: "Recover from errors", tags: "support",
+      text: "Say what went wrong in plain words and offer a way to fix it.",
+      does: "“Password needs 8 characters. You have 6.” beside the field." },
+    { n: "10", name: "Help and documentation", tags: "support",
+      text: "Better when it is not needed, but when it is, make it short, searchable and task-based.",
+      does: "Inline hints and help links that open at the right step." }
+  ];
+
+  /* Each method: when to use it, how many people, what you get back, and how much work it is. */
+  var RESEARCH = [
+    { family: "discover", name: "User interviews", kind: "Qualitative",
+      text: "One-to-one conversations about goals, habits and frustrations.",
+      use: "Early, before solutions exist", people: "5–8 per audience" },
+    { family: "discover", name: "Diary study", kind: "Qualitative",
+      text: "People log what happens over days or weeks as it happens.",
+      use: "Behaviour that unfolds over time", people: "8–15" },
+    { family: "discover", name: "Survey", kind: "Quantitative",
+      text: "A short set of questions sent to many people.",
+      use: "Sizing something you already saw in interviews", people: "100 or more" },
+    { family: "organise", name: "Card sorting", kind: "Mixed",
+      text: "People group content cards into categories that make sense to them.",
+      use: "Before designing navigation or menus", people: "15–30" },
+    { family: "organise", name: "Tree testing", kind: "Quantitative",
+      text: "People find items in a text-only version of your structure.",
+      use: "To check a structure before it is designed", people: "50 or more" },
+    { family: "test", name: "Usability testing", kind: "Qualitative",
+      text: "People attempt realistic tasks with a prototype or product while you watch.",
+      use: "Before build, and again before launch", people: "5 per round" },
+    { family: "test", name: "A/B test", kind: "Quantitative",
+      text: "Two live versions run at once and one metric decides the winner.",
+      use: "After launch, with enough traffic", people: "Enough for significance" },
+    { family: "test", name: "Heuristic evaluation", kind: "Expert review",
+      text: "Specialists review the design against a list of usability heuristics.",
+      use: "A fast check before involving users", people: "3–5 evaluators" }
+  ];
+
+  /* Screen patterns: the wireframe for each id is drawn in app.js. */
+  var PATTERNS = [
+    { family: "start", id: "onboarding", name: "Onboarding",
+      text: "Takes a new person to the first moment of value, one step at a time.",
+      parts: ["Value in one line", "Progress", "One decision per step"] },
+    { family: "start", id: "signin", name: "Sign in",
+      text: "A short, forgiving way back into the product.",
+      parts: ["Email", "Password with show", "Forgot link"] },
+    { family: "core", id: "dashboard", name: "Dashboard",
+      text: "Answers “how is it going?” at a glance and points to what needs attention.",
+      parts: ["Key numbers", "One main chart", "Recent activity"] },
+    { family: "core", id: "listdetail", name: "List and detail",
+      text: "Browse many items on one side and inspect or edit one on the other.",
+      parts: ["Filters", "List", "Selected state"] },
+    { family: "core", id: "settings", name: "Settings",
+      text: "Grouped controls that are easy to scan and safe to change.",
+      parts: ["Grouped sections", "Help under labels", "Toggles"] },
+    { family: "commerce", id: "checkout", name: "Cart and checkout",
+      text: "Gets from a list of items to a paid order with as little friction as possible.",
+      parts: ["Line items", "Order summary", "Guest option"] },
+    { family: "states", id: "empty", name: "Empty state",
+      text: "Turns “nothing here yet” into the first step.",
+      parts: ["Short explanation", "Primary action", "Help link"] },
+    { family: "states", id: "error", name: "Error page",
+      text: "Explains what happened and gets people moving again.",
+      parts: ["What happened", "What to do next", "Way back"] }
+  ];
+
+  var PRODUCT = [
+    { family: "prioritise", name: "RICE", formula: "Reach × Impact × Confidence ÷ Effort",
+      text: "Scores ideas on how many people they touch and how sure you are.",
+      parts: [["R", "Reach"], ["I", "Impact"], ["C", "Confidence"], ["E", "Effort"]],
+      best: "Comparing many ideas when you have real numbers." },
+    { family: "prioritise", name: "MoSCoW",
+      text: "Sorts a scope into what has to ship and what can wait.",
+      parts: [["M", "Must"], ["S", "Should"], ["C", "Could"], ["W", "Won’t"]],
+      best: "Fixing the scope of one release." },
+    { family: "prioritise", name: "Impact and effort",
+      text: "Place each idea by value against cost, then work in order.",
+      parts: [["1", "Quick wins"], ["2", "Big bets"], ["3", "Fill-ins"], ["4", "Money pits"]],
+      best: "Workshops where the team needs to agree fast." },
+    { family: "prioritise", name: "Kano model",
+      text: "Separates what people expect from what pleasantly surprises them.",
+      parts: [["B", "Basic"], ["P", "Performance"], ["D", "Delight"]],
+      best: "Deciding where to invest beyond table stakes." },
+    { family: "metrics", name: "HEART",
+      text: "Five angles on the user experience, each with goals, signals and metrics.",
+      parts: [["H", "Happiness"], ["E", "Engagement"], ["A", "Adoption"], ["R", "Retention"], ["T", "Task success"]],
+      best: "Judging a feature or redesign from the user’s side." },
+    { family: "metrics", name: "AARRR",
+      text: "The funnel from first visit to paying, returning customer.",
+      parts: [["A", "Acquire"], ["A", "Activate"], ["R", "Retain"], ["R", "Refer"], ["R", "Revenue"]],
+      best: "Finding which stage of the journey leaks the most." },
+    { family: "metrics", name: "North Star metric",
+      text: "A single measure the whole team moves together.",
+      parts: [["1", "One metric"], ["V", "Customer value"], ["G", "Leads growth"]],
+      best: "Aligning design, engineering and business on one goal." },
+    { family: "metrics", name: "SUS",
+      text: "The System Usability Scale: a standard questionnaire after a test.",
+      parts: [["10", "Questions"], ["100", "Top score"], ["68", "Average"]],
+      best: "Tracking perceived usability across releases." }
   ];
 
   global.DESIGN_SYSTEM = {
+    HEURISTICS: HEURISTICS,
+    RESEARCH: RESEARCH,
+    PATTERNS: PATTERNS,
+    PRODUCT: PRODUCT,
     ICONS: ICONS,
     SECTIONS: SECTIONS,
     TYPEFACE: TYPEFACE,
@@ -348,15 +413,12 @@
     ACCENT: ACCENT,
     ACCENT_SCALE: ACCENT_SCALE,
     NEUTRAL_SCALE: NEUTRAL_SCALE,
-    ACCENT_USES: ACCENT_USES,
     STATUS: STATUS,
     COLOR_VARIABLES: COLOR_VARIABLES,
     CONTRAST_PAIRS: CONTRAST_PAIRS,
     VARIABLE_COLLECTIONS: VARIABLE_COLLECTIONS,
     BUTTON_VARIANTS: BUTTON_VARIANTS,
     BUTTON_STATES: BUTTON_STATES,
-    STATE_RULES: STATE_RULES,
-    BUTTON_SIZES: BUTTON_SIZES,
-    ANATOMY: ANATOMY
+    BUTTON_SIZES: BUTTON_SIZES
   };
 })(window);

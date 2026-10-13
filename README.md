@@ -1,6 +1,6 @@
-# Design Tool-kit
+# Toolkit
 
-The Figma-ready reference for product design.
+The Figma-ready reference for product design. Less to read, easier to use.
 
 ## Open it
 
@@ -15,10 +15,28 @@ and visit <http://localhost:4321>.
 ## What's inside
 
 **Foundations**
-- **Typography** — one typeface, ten styles, and separate web and mobile sizes.
-- **Colors** — the colour scale, roles, status colours and contrast checks.
-- **Variables** — colour, spacing, radius, sizing, border, elevation, opacity, type and breakpoint values ready to recreate as Figma variables and styles.
+- **Typography** — one typeface, ten styles, with web and mobile sizes.
+- **Colors** — black, white and grey: accent, neutral, status and contrast.
+- **Variables** — the colour, spacing, corner, size and motion values to recreate as Figma variables, for light and dark.
 
 **Components**
-- **Buttons** — six variants × seven static states (default, hover, pressed, focused, selected, disabled, loading), three sizes, anatomy and layout patterns.
-- **Components** — a single-page visual reference for basic components, button variants, sizes and states. Includes category shortcuts, search, compact dimensions, and common form, navigation, feedback, content and overlay patterns.
+- **Components** — the essentials: inputs, navigation, feedback, content and overlays, with their states.
+- **Buttons** — six types, seven states, three sizes and the icon patterns.
+- **Animations** — twelve motions for entrances, attention, loading and effects.
+
+**Practice**
+- **Principles** — UX, UI, product, accessibility and workflow rules, plus eight laws of design psychology.
+- **Heuristics** — Nielsen's ten usability heuristics, each with an example.
+- **Research** — eight research methods: when to use each and how many people you need.
+- **Patterns** — eight common screens as wireframes with the parts each one needs.
+- **Product** — prioritisation and metrics frameworks.
+
+## How it is designed
+
+Three ideas from Apple's design principles run through every page:
+
+- **Clarity** — large type, one idea per card, plain words.
+- **Deference** — the page recedes. Cards are flat, with no outlines.
+- **Depth** — layers come from tone and soft translucency, never from heavy borders.
+
+Nothing on a page is smaller than 12px, every page opens with one sentence, and every page works in light and dark.

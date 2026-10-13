@@ -32,7 +32,7 @@
 
   /* Distance to keep clear above scroll targets: only the mobile menu bar is sticky. */
   function scrollOffset() {
-    var bar = document.querySelector(".menubar");
+    var bar = document.querySelector(".topbar");
     return bar && bar.offsetHeight ? bar.offsetHeight + 16 : 24;
   }
 
@@ -75,39 +75,15 @@
     page.querySelectorAll("[data-page-family]").forEach(function (family) {
       family.hidden = selected !== "all" && family.getAttribute("data-page-family") !== selected;
     });
+    page.querySelectorAll("[data-tags]").forEach(function (card) {
+      var out = selected !== "all" && card.getAttribute("data-tags").split(" ").indexOf(selected) === -1;
+      card.classList.toggle("is-filtered-out", out);
+    });
   }
 
   function setNavOpen(open) {
     document.documentElement.classList.toggle("is-nav-open", open);
     $("menu-trigger").setAttribute("aria-expanded", open ? "true" : "false");
-  }
-
-  function closeSearch() {
-    if (!searchInput) return;
-    searchInput.closest(".search").classList.remove("is-open");
-    $("search-trigger").setAttribute("aria-expanded", "false");
-  }
-
-  function loadSearchInput() {
-    if (searchInput) return searchInput;
-    var panel = document.querySelector(".search");
-    panel.insertAdjacentHTML("beforeend", '<input id="search" type="search" aria-label="Search this page" placeholder="Search this page" autocomplete="off">');
-    searchInput = $("search");
-    $("search-trigger").setAttribute("aria-controls", "search");
-
-    searchInput.addEventListener("input", applyFilter);
-    searchInput.addEventListener("blur", function () {
-      var input = this;
-      setTimeout(function () { if (!input.value) closeSearch(); }, 0);
-    });
-    searchInput.addEventListener("keydown", function (e) {
-      if (e.key !== "Escape") return;
-      this.value = "";
-      applyFilter();
-      closeSearch();
-      $("search-trigger").focus();
-    });
-    return searchInput;
   }
 
   function specChips(list) {
@@ -189,6 +165,7 @@
       return '<section class="page" id="page-' + s.id + '" hidden>' +
         '<header class="page-head">' +
           '<h1 class="page-title">' + s.name + '</h1>' +
+          '<p class="page-intro">' + s.intro + '</p>' +
         '</header>' +
         '<div id="body-' + s.id + '"></div>' +
         '<p class="empty" hidden>Nothing on this page matches your search.</p>' +
@@ -201,10 +178,12 @@
     var q = searchInput ? searchInput.value.trim().toLowerCase() : "";
     var total = 0, shown = 0;
     page.querySelectorAll(".group").forEach(function (g) {
+      if (g.classList.contains("is-filtered-out")) return;
       var items = g.querySelectorAll("[data-name]");
       if (!items.length) return;
       var any = false;
       items.forEach(function (item) {
+        if (item.classList.contains("is-filtered-out")) return;
         total++;
         var match = !q || item.getAttribute("data-name").indexOf(q) !== -1;
         item.hidden = !match;
@@ -250,18 +229,6 @@
     return s[p][0] + " / " + s[p][1] + " · " + weightName(s.weight) + " · " + trackingLabel(s.tracking);
   }
 
-  function inUse(p) {
-    var S = {};
-    D.TYPE_STYLES.forEach(function (s) { S[s.name] = s; });
-    return '<div class="in-use' + (p === "mobile" ? " in-use--mobile" : "") + '">' +
-      '<span style="' + styleCss(S.Overline, p) + 'color:var(--accent-text)">Component guide</span>' +
-      '<span style="' + styleCss(S["Heading 2"], p) + '">Every component has a role</span>' +
-      '<span style="' + styleCss(S.Body, p) + 'color:var(--text-secondary)">Named styles, clear hierarchy and reusable variants make every screen feel consistent.</span>' +
-      '<span style="' + styleCss(S.Caption, p) + 'color:var(--text-tertiary)">4 min read · Updated today</span>' +
-      '<button class="btn btn--primary" type="button" style="--btn-font:' + S.Label[p][0] + 'px">Read the guide</button>' +
-    '</div>';
-  }
-
   function renderTypography() {
     var tf = D.TYPEFACE;
     var P = D.PLATFORMS[platform];
@@ -270,15 +237,12 @@
       '<article class="card typeface" data-name="typeface poppins font family weights characters">' +
         '<div class="typeface-specimen" aria-hidden="true">Aa</div>' +
         '<div class="typeface-info">' +
-          '<p class="eyebrow">One family for everything</p>' +
           '<h3 class="typeface-name">' + tf.name + '</h3>' +
-          '<p class="doc-text">Headings, body, labels and numbers all use ' + tf.name + '. It is free on Google Fonts and available in Figma. Four weights cover every style.</p>' +
+          '<p class="doc-text doc-text--shown">One family for headings, body, labels and numbers. Four weights cover every style.</p>' +
           '<div class="weights">' + tf.weights.map(function (w) {
             return '<div class="weight"><span class="weight-sample" style="font-weight:' + w.value + '">Aa</span>' +
               '<span class="weight-name">' + w.name + ' · ' + w.value + '</span></div>';
           }).join("") + '</div>' +
-          '<p class="charset">ABCDEFGHIJKLMNOPQRSTUVWXYZ<br>abcdefghijklmnopqrstuvwxyz<br>0123456789 &amp; @ # % ! ? ( ) , . : ;</p>' +
-          '<p class="charset-note">Turn on tabular figures wherever numbers need to line up: <span class="tnum">1,284.50 · 972.10</span></p>' +
         '</div>' +
       '</article>');
 
@@ -303,34 +267,9 @@
 
     var typeStylesGroup = group("Type styles", D.TYPE_STYLES.length + " styles · " + P.name, "Size / line height in px, weight, letter spacing.", switcher + cards);
 
-    var responsiveGroup = group("Web vs mobile", "size / line height in px",
-      "Headings shrink on mobile while body and labels grow — phones are held closer, but touch needs bigger labels and text fields need 16px.",
-      '<article class="card card--pad"><div class="table-scroll"><table class="table">' +
-        '<thead><tr><th>Style</th><th>Web</th><th>Mobile</th><th>Change</th><th>Weight</th><th>Letter spacing</th></tr></thead><tbody>' +
-        D.TYPE_STYLES.map(function (s) {
-          var pct = Math.round((s.mobile[0] - s.web[0]) / s.web[0] * 100);
-          return '<tr data-name="' + key([s.name, "web mobile compare"]) + '">' +
-            '<td class="strong">' + s.name + '</td>' +
-            '<td>' + s.web[0] + ' / ' + s.web[1] + '</td>' +
-            '<td>' + s.mobile[0] + ' / ' + s.mobile[1] + '</td>' +
-            '<td>' + (pct > 0 ? "+" : pct < 0 ? "−" : "") + Math.abs(pct) + '%</td>' +
-            '<td>' + weightName(s.weight) + '</td>' +
-            '<td>' + trackingLabel(s.tracking) + '</td>' +
-          '</tr>';
-        }).join("") +
-      '</tbody></table></div></article>');
-
-    var inUseGroup = group("In use", null, "The same article header set in each platform's styles.",
-      '<div class="grid grid--2">' + ["web", "mobile"].map(function (p) {
-        return '<article class="card" data-name="in use hierarchy example ' + p + '">' +
-          '<div class="doc-body"><h3 class="doc-title">' + D.PLATFORMS[p].name + '</h3></div>' + inUse(p) + '</article>';
-      }).join("") + '</div>');
-
     var families = [
       { id: "typeface", name: "Typeface", content: typefaceGroup },
-      { id: "styles", name: "Type styles", content: typeStylesGroup },
-      { id: "responsive", name: "Responsive", content: responsiveGroup },
-      { id: "in-use", name: "In use", content: inUseGroup }
+      { id: "styles", name: "Styles", content: typeStylesGroup }
     ];
     var html = filterBar("typography-filters", "Typography filters", "data-typography-filter",
       [{ id: "all", name: "All" }].concat(families), typographyFilter) +
@@ -365,53 +304,10 @@
     }).join("") + '</div>';
   }
 
-  var USE_DEMOS = {
-    fill: '<button class="btn btn--primary" type="button" tabindex="-1">Button</button>',
-    hover: '<button class="btn btn--primary is-hover" type="button" tabindex="-1">Button</button>',
-    pressed: '<button class="btn btn--primary is-pressed" type="button" tabindex="-1">Button</button>',
-    tint: '<span class="chip is-selected">' + I.check + 'Selected</span>',
-    text: '<span class="use-link">View details</span>',
-    focus: '<button class="btn btn--secondary is-focus" type="button" tabindex="-1">Button</button>',
-    on: '<span class="use-on">Aa</span>'
-  };
-
-  function modeCard(mode) {
-    var roles = ["bg/page", "bg/surface", "text/primary", "text/secondary", "accent/default", "accent/tint", "border/strong", "status/danger"];
-    return '<article class="card mode-card" data-theme="' + mode + '" data-name="' + mode + ' mode theme appearance">' +
-      '<div class="mode-card-head"><span class="mode-card-title">' + (mode === "light" ? "Light" : "Dark") + '</span></div>' +
-      '<div class="mode-card-body">' +
-        '<ul class="role-list">' + roles.map(function (n) {
-          var v = VAR[n][mode];
-          return '<li><span class="role-dot" style="background:' + v[1] + '"></span>' +
-            '<span><strong style="color:var(--text);font-weight:600">' + n + '</strong><br>' + v[0] + '</span></li>';
-        }).join("") + '</ul>' +
-        '<div class="mode-sample">' +
-          '<span class="mode-sample-title">Invite your team</span>' +
-          '<span class="mode-sample-text">Collaborators can edit every page in this project.</span>' +
-          '<div class="row"><button class="btn btn--primary btn--sm" type="button">Send invite</button>' +
-          '<button class="btn btn--ghost btn--sm" type="button">Not now</button>' +
-          '<span class="badge badge--accent">3 seats left</span></div>' +
-        '</div>' +
-      '</div>' +
-    '</article>';
-  }
-
   function renderColors() {
     var A = D.ACCENT;
 
-    var color = group("Colour language", "2 ideas", null,
-      '<div class="color-language">' +
-        '<article class="card color-language-card" data-name="solid shade tone color light dark">' +
-          '<div class="color-language-swatch color-language-swatch--solid"><strong>Ink</strong><span>#171717</span></div>' +
-          '<div><h3 class="doc-title">Shade means light or dark</h3><p class="color-language-copy">A shade is a solid colour. Names such as Pale gray and Ink tell you how light or dark it is — they are not opacity.</p></div>' +
-        '</article>' +
-        '<article class="card color-language-card" data-name="opacity transparent 100 10 percent full color">' +
-          '<div class="color-language-opacity"><span>100%</span><span>10%</span></div>' +
-          '<div><h3 class="doc-title">Opacity means transparency</h3><p class="color-language-copy">100% shows the full colour. 10% lets the background show through, which is useful for soft borders and overlays.</p></div>' +
-        '</article>' +
-      '</div>');
-
-    var accent = group("Accent", "1 colour", null,
+    var accent = group("Accent", null, null,
       '<article class="card accent-hero" data-name="accent mono black white grey brand">' +
         '<div class="accent-hero-swatch">' +
           '<span class="accent-hero-name">' + A.name + '</span>' +
@@ -423,34 +319,19 @@
           '<p class="doc-text">The whole system is black, white and grey. The strongest tone marks an action, a selection or focus, and everything else stays quieter.</p>' +
           '<ul class="rule-list">' +
             '<li class="yes">' + I.check + '<span>Buttons, links, checked controls, selected items, focus and progress.</span></li>' +
-            '<li class="yes">' + I.check + '<span>Mono 900 is the default action colour; Mono 100 in dark mode.</span></li>' +
             '<li class="no">' + I.x + '<span>Decoration, illustrations, large backgrounds or body text.</span></li>' +
             '<li class="no">' + I.x + '<span>Relying on tone alone for success, warning or danger — pair those with an icon and a label.</span></li>' +
           '</ul>' +
         '</div>' +
       '</article>');
 
-    accent += group("Accent tones", D.ACCENT_SCALE.length + " solid colours",
-      "The default action colour is tagged. The ratio is the contrast of the label colour on that solid colour.",
+    accent += group("Accent tones", null, null,
       scaleStrip(D.ACCENT_SCALE, "accent", { 900: "Default" }));
 
-    var inUse = group("Accent in use", D.ACCENT_USES.length + " roles",
-      "The same black doing different jobs. Each job is its own reusable variable.",
-      '<div class="grid" style="--min:210px">' + D.ACCENT_USES.map(function (u) {
-        return '<article class="card" data-name="' + key(["accent", u.name, u.variable, u.note]) + '">' +
-          '<div class="use-demo">' + USE_DEMOS[u.demo] + '</div>' +
-          '<div class="doc-body"><h3 class="doc-title">' + u.name + '</h3>' +
-            '<span class="rule-timing">' + u.variable + '</span>' +
-            '<p class="doc-text">' + u.note + '</p></div>' +
-        '</article>';
-      }).join("") + '</div>');
-
-    var neutral = group("Neutral tones", D.NEUTRAL_SCALE.length + " solid colours",
-      "Every surface, text colour and border comes from this grayscale family.",
+    var neutral = group("Neutral tones", null, null,
       scaleStrip(D.NEUTRAL_SCALE, "neutral"));
 
-    color += group("Status", D.STATUS.length + " colours",
-      "Reserved for meaning. They never decorate, and they never stand in for the accent.",
+    var status = group("Status", null, null,
       '<div class="grid grid--3">' + D.STATUS.map(function (s) {
         return '<article class="card" data-name="' + key(["status", s.name, s.use]) + '">' +
           '<div class="status-swatches">' +
@@ -464,11 +345,10 @@
         '</article>';
       }).join("") + '</div>');
 
-    var contrastGroup = group("Contrast", "WCAG 2.1",
-      "AA needs 4.5:1 for normal text and 3:1 for large text (18px and up, or 14px bold).",
+    var contrastGroup = group("Contrast", null, "AA needs 4.5:1 for normal text and 3:1 for large text.",
       '<article class="card card--pad"><div class="table-scroll"><table class="table">' +
         '<thead><tr><th>Where</th><th>Pair</th><th>Contrast</th></tr></thead><tbody>' +
-        D.CONTRAST_PAIRS.map(function (p) {
+        D.CONTRAST_PAIRS.slice(0, 5).map(function (p) {
           var light = contrast(resolve(p.fg, "light"), resolve(p.bg, "light", p.over));
           return '<tr data-name="' + key([p.use, p.fg, p.bg, "contrast"]) + '">' +
             '<td class="strong">' + p.use + '</td>' +
@@ -479,9 +359,9 @@
       '</tbody></table></div></article>');
 
     var families = [
-      { id: "color", name: "Color", content: color },
-      { id: "accent", name: "Accent", content: accent + inUse },
+      { id: "accent", name: "Accent", content: accent },
       { id: "neutral", name: "Neutral", content: neutral },
+      { id: "status", name: "Status", content: status },
       { id: "contrast", name: "Contrast", content: contrastGroup }
     ];
     var html = filterBar("color-filters", "Color filters", "data-color-filter",
@@ -503,12 +383,11 @@
 
   function renderAnimations() {
     var entrances = [
-      ["Fade", "fade"], ["Slide up", "slide-up"], ["Slide down", "slide-down"],
-      ["Slide left", "slide-left"], ["Slide right", "slide-right"], ["Scale", "scale"], ["Pop", "pop"]
+      ["Fade", "fade"], ["Slide up", "slide-up"], ["Scale", "scale"], ["Pop", "pop"]
     ];
-    var attention = [["Bounce", "bounce"], ["Shake", "shake"], ["Rotate", "rotate"], ["Pulse", "pulse"]];
+    var attention = [["Bounce", "bounce"], ["Shake", "shake"], ["Pulse", "pulse"]];
     var loops = [["Loading", "loading"], ["Shimmer", "shimmer"]];
-    var effects = [["Ripple", "ripple"], ["Glow", "glow"], ["Float", "float"], ["Morph", "morph"], ["Blur", "blur"]];
+    var effects = [["Ripple", "ripple"], ["Glow", "glow"], ["Float", "float"]];
     function motionGroup(title, list) {
       return group(title, null, null, '<div class="motion-grid">' + list.map(function (item) { return motionCard(item[0], item[1]); }).join("") + '</div>');
     }
@@ -533,13 +412,9 @@
       patterns: '<i></i><i></i>',
       chunks: '<i></i><i></i><i></i><i></i><i></i><i></i>',
       gaps: '<i></i><i></i><i></i><i></i>',
-      complexity: '<i></i><i></i><i></i>',
       response: '<i></i><i></i>',
       peak: '<i></i><i></i><i></i><i></i>',
-      similarity: '<i></i><i></i><i></i><i></i><i></i>',
-      standout: '<i></i><i></i><i></i><i></i><i></i>',
-      region: '<i></i><i></i><i></i>',
-      goal: '<i></i><i></i><i></i><i></i>'
+      standout: '<i></i><i></i><i></i><i></i><i></i>'
     };
     return '<div class="law-diagram law-diagram--' + type + '">' + shapes[type] + '</div><span class="law-number">' + number + '</span>';
   }
@@ -549,45 +424,33 @@
       ["Start with the task", "Design around what people need to do, not the features available.", I.checkCircle],
       ["Make status visible", "Show progress, results, and changes as they happen.", I.info],
       ["Prevent mistakes", "Use clear constraints and sensible defaults before an error can occur.", I.alertCircle],
-      ["Support everyone", "Build for keyboard, screen readers, contrast, touch, and different contexts.", I.heart],
       ["Design every state", "Plan empty, loading, error, and success states, not only the ideal one.", I.layers],
-      ["Reduce effort", "Cut steps, typing, and decisions. Remember what people have already told you.", I.copy],
-      ["Let people undo", "Make actions reversible so exploring feels safe. Confirm only what cannot be undone.", I.replay],
-      ["Write for clarity", "Use plain, specific words. Say what a control does and what happens next.", I.edit]
+      ["Let people undo", "Make actions reversible so exploring feels safe. Confirm only what cannot be undone.", I.replay]
     ];
     var ui = [
       ["Create hierarchy", "Use size, weight, spacing, and contrast to show what matters first.", I.arrowRight],
       ["Be consistent", "Reuse patterns, labels, and component states so behaviour stays predictable.", I.check],
       ["Keep it focused", "Show only what supports the current task; reveal detail when it is needed.", I.search],
-      ["Design responsive", "Keep content readable and controls reachable across every screen size.", I.replay],
       ["Use space with intent", "White space groups, separates, and lets content breathe. Spacing is a design tool.", I.grid],
-      ["Keep type readable", "Limit sizes and weights. Keep body text comfortable, with generous line height.", I.edit],
-      ["Reserve colour for meaning", "Use colour for action, status, and focus, not decoration.", I.sun],
-      ["Align to a grid", "A shared spacing and column system makes layouts feel ordered and easy to scan.", I.layers]
+      ["Reserve colour for meaning", "Use colour for action, status, and focus, not decoration.", I.sun]
     ];
     var product = [
       ["Solve a real need", "Connect every experience to a clear customer problem and outcome.", I.plus],
       ["Make value clear", "People should understand what they gain before they commit.", I.info],
       ["Learn from use", "Measure behaviour, listen to feedback, and improve the next decision.", I.replay],
-      ["Build trust", "Use honest language, clear choices, and reliable behaviour at every step.", I.checkCircle],
-      ["Define success", "Agree what good looks like before designing, so every decision can be judged against it.", I.check],
-      ["Ship small, learn fast", "Release in small steps so each decision is tested against real use.", I.arrowUpRight],
-      ["Align the team", "Share one problem statement so design, engineering, and business pull the same way.", I.layers],
-      ["Plan for scale", "Prefer reusable components and variables over one-off screens.", I.grid]
+      ["Define success", "Agree what good looks like before designing, so every decision can be judged against it.", I.check]
     ];
     var accessibility = [
       ["Meet contrast", "Text needs at least 4.5:1 against its background; large text and UI parts need 3:1.", I.sun],
       ["Don’t rely on colour alone", "Pair colour with an icon, label, or pattern so status survives colour blindness.", I.alertCircle],
       ["Make targets touchable", "Give every control at least a 44 px touch target, with space between neighbours.", I.plus],
-      ["Show focus", "Keep a visible focus ring and a logical keyboard order on every interactive element.", I.search],
-      ["Respect motion preferences", "Keep animation short and optional. Reduce or remove it when people ask for less motion.", I.monitor]
+      ["Show focus", "Keep a visible focus ring and a logical keyboard order on every interactive element.", I.search]
     ];
     var workflow = [
       ["Use variables, not raw values", "Reference colour, spacing, and type variables so a change in one place updates everywhere.", I.copy],
       ["Name things clearly", "Name layers, components, and variants by purpose so anyone can find and reuse them.", I.edit],
       ["Test with real content", "Try long names, empty states, and real data before calling a layout finished.", I.info],
-      ["Annotate for handoff", "Note behaviour, states, and edge cases so engineers do not have to guess.", I.arrowRight],
-      ["Document decisions", "Record why a choice was made so the team can build on it instead of reopening it.", I.bookmark]
+      ["Annotate for handoff", "Note behaviour, states, and edge cases so engineers do not have to guess.", I.arrowRight]
     ];
     var laws = [
       ["Hick’s Law", "More choices take longer to decide. Prioritise and group options.", lawVisual("choices", "01")],
@@ -595,13 +458,9 @@
       ["Jakob’s Law", "People expect familiar patterns. Follow conventions before inventing new ones.", lawVisual("patterns", "03")],
       ["Miller’s Law", "Working memory is limited. Break information into smaller, meaningful chunks.", lawVisual("chunks", "04")],
       ["Law of Proximity", "Items placed together are understood as related. Use spacing to show groups.", lawVisual("gaps", "05")],
-      ["Tesler’s Law", "Every task has complexity. Move unavoidable complexity away from the user.", lawVisual("complexity", "06")],
-      ["Doherty Threshold", "Fast feedback keeps people engaged. Aim for responses within about 400 ms.", lawVisual("response", "07")],
-      ["Peak-End Rule", "People remember the high point and ending. Design key moments and completion well.", lawVisual("peak", "08")],
-      ["Law of Similarity", "Elements that look alike are seen as a group. Style related items the same way.", lawVisual("similarity", "09")],
-      ["Von Restorff Effect", "The item that differs is the one remembered. Use contrast sparingly for what matters most.", lawVisual("standout", "10")],
-      ["Law of Common Region", "Items inside a shared boundary read as one group. Use cards and containers to group content.", lawVisual("region", "11")],
-      ["Goal-Gradient Effect", "Effort rises as the goal gets closer. Show progress so people keep going.", lawVisual("goal", "12")]
+      ["Doherty Threshold", "Fast feedback keeps people engaged. Aim for responses within about 400 ms.", lawVisual("response", "06")],
+      ["Peak-End Rule", "People remember the high point and ending. Design key moments and completion well.", lawVisual("peak", "07")],
+      ["Von Restorff Effect", "The item that differs is the one remembered. Use contrast sparingly for what matters most.", lawVisual("standout", "08")]
     ];
     function principleGroup(title, list, isLaw) {
       return group(title, null, null, '<div class="principles-grid">' + list.map(function (item) { return principleCard(item[0], item[1], item[2], isLaw); }).join("") + '</div>');
@@ -613,6 +472,125 @@
       { id: "accessibility", name: "Accessibility", content: principleGroup("Accessibility", accessibility) },
       { id: "workflow", name: "Workflow", content: principleGroup("Workflow", workflow) },
       { id: "laws", name: "Laws", content: principleGroup("Laws", laws, true) }
+    ]);
+  }
+
+  /* ================= REFERENCE PAGES ================= */
+  /* One card shape for heuristics, research, patterns and product: a title, a line of
+     explanation, then labelled facts and/or chips. */
+  function refCard(o) {
+    var facts = o.facts || [];
+    return '<article class="card ref-card" data-name="' + key([o.title, o.text].concat(facts.map(function (f) { return f[1]; })).concat(o.chips || [])) + '"' +
+      (o.tags ? ' data-tags="' + o.tags + '"' : "") + '>' +
+      (o.visual || "") +
+      '<div class="ref-head"><h3 class="doc-title">' + o.title + '</h3>' +
+        (o.badge ? '<span class="badge">' + o.badge + '</span>' : "") + '</div>' +
+      '<p class="ref-text">' + o.text + '</p>' +
+      (facts.length ? '<dl class="ref-facts">' + facts.map(function (f) {
+        return '<div><dt>' + f[0] + '</dt><dd>' + f[1] + '</dd></div>';
+      }).join("") + '</dl>' : "") +
+      (o.chips ? '<ul class="spec-chips">' + o.chips.map(function (c) { return '<li>' + c + '</li>'; }).join("") + '</ul>' : "") +
+    '</article>';
+  }
+
+  function refGroup(title, cards, wide) {
+    return group(title, null, null, '<div class="ref-grid' + (wide ? ' ref-grid--wide' : '') + '">' + cards.join("") + '</div>');
+  }
+
+  /* Filters that keep one list in its own order: cards carry data-tags and the bar hides the rest. */
+  function tagPage(page, label, filters, content) {
+    var selected = pageFilters[page] || "all";
+    $("body-" + page).innerHTML = filterBar("page-filters", label, "data-page-filter",
+      [{ id: "all", name: "All" }].concat(filters), selected) + content;
+    applyPageFilter($("page-" + page));
+  }
+
+  function renderHeuristics() {
+    var cards = D.HEURISTICS.map(function (h) {
+      return refCard({
+        title: h.name, text: h.text, tags: h.tags,
+        visual: '<div class="principle-visual">' + h.n + '</div>',
+        facts: [["Example", h.does]]
+      });
+    });
+    tagPage("heuristics", "Heuristic filters",
+      [{ id: "clarity", name: "Clarity" }, { id: "control", name: "Control" }, { id: "support", name: "Support" }],
+      refGroup("Nielsen’s 10 heuristics", cards));
+  }
+
+  function renderResearch() {
+    function methods(family) {
+      return D.RESEARCH.filter(function (m) { return m.family === family; }).map(function (m) {
+        return refCard({
+          title: m.name, badge: m.kind, text: m.text,
+          facts: [["Use when", m.use], ["People", m.people]]
+        });
+      });
+    }
+    familyPage("research", "Research filters", [
+      { id: "discover", name: "Discover", content: refGroup("Discover", methods("discover")) },
+      { id: "organise", name: "Organise", content: refGroup("Organise", methods("organise")) },
+      { id: "test", name: "Test", content: refGroup("Test", methods("test")) }
+    ]);
+  }
+
+  /* Greyscale wireframes made of plain blocks, so each pattern reads at a glance. */
+  function w(cls, inner) {
+    return '<div class="' + cls.split(" ").map(function (c) { return "wf-" + c; }).join(" ") + '">' + (inner || "") + '</div>';
+  }
+
+  function wireframe(id) {
+    var t = w("t"), ts = w("t s"), th = w("t h");
+    var item = w("box item");
+    var bars = ["40", "65", "50", "85", "60"].map(function (h) { return '<i style="height:' + h + '%"></i>'; }).join("");
+    var screens = {
+      onboarding: w("col center fill", w("img circle") + th + ts + w("dots", w("dot on") + w("dot") + w("dot")) + w("btn")),
+      signin: w("col center fill", th + w("field") + w("field") + w("btn") + w("t xs")),
+      dashboard: w("row", w("box stat") + w("box stat") + w("box stat")) +
+        w("row fill", w("box fill bars", bars) + w("col side", t + t + ts)),
+      listdetail: w("row fill", w("col list", w("box item on") + item + item + item) + w("box fill pane", th + t + t + ts)),
+      search: w("field") + w("row", w("chip") + w("chip") + w("chip")) + item + item + item,
+      settings: w("box fill rows", [1, 2, 3].map(function () {
+        return w("row between", w("col", t + w("t xs")) + w("toggle"));
+      }).join("")),
+      product: w("row fill", w("img fill") + w("col fill", th + ts + w("row", w("swatch") + w("swatch") + w("swatch")) + w("btn"))),
+      checkout: w("row fill", w("col fill", item + item + item) + w("box summary", t + t + w("btn"))),
+      empty: w("col center fill", w("img circle dashed") + th + ts + w("btn")),
+      error: w("col center fill", w("t xl") + ts + w("row", w("btn") + w("btn ghost")))
+    };
+    return '<div class="wf" aria-hidden="true">' + screens[id] + '</div>';
+  }
+
+  function renderPatterns() {
+    function screens(family) {
+      return D.PATTERNS.filter(function (p) { return p.family === family; }).map(function (p) {
+        return refCard({ title: p.name, text: p.text, visual: wireframe(p.id), chips: p.parts });
+      });
+    }
+    familyPage("patterns", "Pattern filters", [
+      { id: "start", name: "Start", content: refGroup("Start", screens("start")) },
+      { id: "core", name: "Core", content: refGroup("Core", screens("core")) },
+      { id: "commerce", name: "Commerce", content: refGroup("Commerce", screens("commerce")) },
+      { id: "states", name: "States", content: refGroup("States", screens("states")) }
+    ]);
+  }
+
+  function renderProduct() {
+    function frameworks(family) {
+      return D.PRODUCT.filter(function (f) { return f.family === family; }).map(function (f) {
+        var facts = f.formula ? [["Formula", f.formula]] : [];
+        return refCard({
+          title: f.name, text: f.text,
+          visual: '<div class="fw-parts' + (f.parts.length > 3 ? ' fw-parts--many' : '') + '" style="--n:' + f.parts.length + '">' + f.parts.map(function (p) {
+            return '<span><b>' + p[0] + '</b><em>' + p[1] + '</em></span>';
+          }).join("") + '</div>',
+          facts: facts.concat([["Best for", f.best]])
+        });
+      });
+    }
+    familyPage("product", "Product filters", [
+      { id: "prioritise", name: "Prioritisation", content: refGroup("Prioritisation", frameworks("prioritise"), true) },
+      { id: "metrics", name: "Metrics", content: refGroup("Metrics", frameworks("metrics"), true) }
     ]);
   }
 
@@ -662,11 +640,10 @@
     return row[1];
   }
 
-  /* Ten collections would be ten buttons; three groups plus Color read better. */
+  /* Eight collections would be eight buttons; two groups plus Color read better. */
   var VARIABLE_GROUPS = [
-    { id: "layout", name: "Layout", ids: ["spacing", "radius", "sizing", "border", "elevation", "opacity", "breakpoints"] },
-    { id: "motion", name: "Motion", ids: ["duration", "easing"] },
-    { id: "type", name: "Type", ids: ["type"] }
+    { id: "layout", name: "Layout", ids: ["spacing", "radius", "sizing", "border", "elevation", "breakpoints"] },
+    { id: "motion", name: "Motion", ids: ["duration", "easing"] }
   ];
 
   function renderVariables() {
@@ -743,23 +720,15 @@
         }).join("") +
       '</tbody></table></div></article>');
 
-    var stateRulesHtml = group("State rules", null, "What changes in each state, and how fast.",
-      '<div class="state-rules">' + D.STATE_RULES.map(function (r) {
-        return '<article class="card rule-card" data-name="' + key([r.name, "state rule", r.rule]) + '">' +
-          '<div class="principle-head"><h3 class="doc-title">' + r.name + '</h3><span class="rule-timing">' + r.timing + '</span></div>' +
-          '<p class="doc-text">' + r.rule + '</p></article>';
-      }).join("") + '</div>');
-
     var variantsHtml = group("Variants", D.BUTTON_VARIANTS.length + " variants", "Pick by importance, not by colour.",
       '<div class="grid grid--3">' + D.BUTTON_VARIANTS.map(function (v) {
         return '<article class="card" data-name="' + key([v.name, "variant", v.use]) + '">' +
           '<div class="doc-demo">' +
             '<button class="btn btn--' + v.id + '" type="button">' + v.label + '</button>' +
-            '<button class="btn btn--' + v.id + ' btn--sm" type="button">' + v.label + '</button>' +
           '</div>' +
           '<div class="doc-body">' +
             '<h3 class="doc-title">' + v.name + '</h3>' +
-            '<div class="do-dont"><div class="do"><strong>Use for</strong>' + v.use + '</div><div class="dont"><strong>Avoid</strong>' + v.avoid + '</div></div>' +
+            '<p class="doc-text doc-text--shown">' + v.use + '</p>' +
           '</div>' +
         '</article>';
       }).join("") + '</div>');
@@ -776,54 +745,27 @@
           '<div class="doc-body">' +
             '<h3 class="doc-title">' + s.name + '</h3>' +
             '<p class="doc-text">' + s.use + '</p>' +
-            specChips([["Height", s.height], ["Padding", s.padding], ["Radius", s.radius], ["Label", s.label], ["Icon", s.icon], ["Gap", s.gap]]) +
+            specChips([["Height", s.height], ["Padding", s.padding], ["Radius", s.radius]]) +
           '</div>' +
         '</article>';
       }).join("") + '</div>');
 
-    var anatomyHtml = group("Anatomy", D.ANATOMY.length + " parts", null,
-      '<article class="card anatomy" data-name="anatomy parts container icon label focus ring">' +
-        '<div class="anatomy-stage">' +
-          '<button class="btn btn--primary btn--lg is-focus" type="button" tabindex="-1">' +
-            '<i class="marker marker--corner"><b>1</b></i>' +
-            '<span class="marked">' + I.plus + '<i class="marker"><b>2</b></i></span>' +
-            '<span class="marked">New project<i class="marker"><b>3</b></i></span>' +
-            '<span class="marked">' + I.arrowRight + '<i class="marker"><b>4</b></i></span>' +
-            '<i class="marker marker--focus"><b>5</b></i>' +
-          '</button>' +
-        '</div>' +
-        '<ol class="anatomy-list">' + D.ANATOMY.map(function (a, i) {
-          return '<li><b>' + (i + 1) + '</b><div><div class="anatomy-part">' + a.part + '</div><div class="anatomy-desc">' + a.desc + '</div></div></li>';
-        }).join("") + '</ol>' +
-      '</article>');
-
     var patterns = [
       { name: "Leading icon", text: "An icon before the label names what the action creates.",
         demo: '<button class="btn btn--primary" type="button">' + I.plus + 'New project</button>' },
-      { name: "Trailing icon", text: "A trailing arrow means the action moves you forward.",
-        demo: '<button class="btn btn--secondary" type="button">Continue' + I.arrowRight + '</button>' },
       { name: "Icon only", text: "Square — width equals height. Always add a tooltip; on mobile keep the tap area at 44px.",
         demo: '<button class="btn btn--ghost btn--icon" type="button" aria-label="Like">' + I.heart + '</button>' +
           '<button class="btn btn--secondary btn--icon" type="button" aria-label="Download">' + I.download + '</button>' +
           '<button class="btn btn--danger btn--icon" type="button" aria-label="Delete">' + I.trash + '</button>' },
-      { name: "Full width", text: "Fills its container. For narrow forms and mobile sheets.",
-        demo: '<div style="width:100%;max-width:320px"><button class="btn btn--primary btn--lg btn--block" type="button">Create account</button></div>' },
       { name: "Pill", text: "Fully rounded, for social actions and filters. Works with every variant and size.",
         demo: '<button class="btn btn--primary btn--pill" type="button">Follow</button>' +
           '<button class="btn btn--outline btn--pill is-selected" type="button" tabindex="-1">' + I.check + 'Following</button>' },
-      { name: "Button group", text: "One choice from a few options. The chosen one is Selected — click to switch.",
-        demo: '<div class="btn-group" role="group" aria-label="Range">' +
-          '<button class="btn btn--secondary" type="button" aria-pressed="false">Day</button>' +
-          '<button class="btn btn--secondary" type="button" aria-pressed="true">Week</button>' +
-          '<button class="btn btn--secondary" type="button" aria-pressed="false">Month</button></div>' },
       { name: "Toggle", text: "Stays selected after a click, like Save or Bold. Click to try it.",
         demo: '<button class="btn btn--secondary" type="button" aria-pressed="false" data-toggle>' + I.heart + 'Save</button>' +
           '<button class="btn btn--ghost" type="button" aria-pressed="true" data-toggle>' + I.heart + 'Saved</button>' },
-      { name: "Loading", text: "A static loading variant holds its width while a progress indicator replaces the label.",
-        demo: '<button class="btn btn--primary is-loading" type="button" aria-busy="true" disabled>' + I.download + 'Export</button>' }
     ];
 
-    var layoutHtml = group("Icons & layout", patterns.length + " patterns", null,
+    var layoutHtml = group("Icons", null, null,
       '<div class="grid grid--3">' + patterns.map(function (p) {
         return '<article class="card" data-name="' + key([p.name, "pattern", p.text]) + '">' +
           '<div class="doc-demo">' + p.demo + '</div>' +
@@ -832,11 +774,10 @@
       }).join("") + '</div>');
 
     familyPage("buttons", "Button filters", [
-      { id: "states", name: "States", content: statesHtml + stateRulesHtml },
       { id: "variants", name: "Variants", content: variantsHtml },
+      { id: "states", name: "States", content: statesHtml },
       { id: "sizes", name: "Sizes", content: sizesHtml },
-      { id: "anatomy", name: "Anatomy", content: anatomyHtml },
-      { id: "layout", name: "Layout", content: layoutHtml }
+      { id: "icons", name: "Icons", content: layoutHtml }
     ]);
   }
 
@@ -935,18 +876,9 @@
     ];
 
     var pickers = [
-      doc({ name: "Search", keys: "find query filter command",
-        demo: '<div class="basic-search" role="search">' + I.search + '<span>Search projects</span><kbd>⌘ K</kbd></div>',
-        specs: [["Height", 40], ["Leading icon", 16], ["Shortcut", "Optional"], ["Radius", 8]] }),
       doc({ name: "Slider", keys: "range value adjust",
         demo: '<div class="basic-slider"><span>Zoom</span><div class="basic-slider-track"><i style="width:65%"></i><b style="left:65%"></b></div><strong>65%</strong></div>',
-        specs: [["Track", 4], ["Thumb", 16], ["Range", "0–100%"], ["Focus", "focus/ring"]] }),
-      doc({ name: "Date picker", keys: "calendar date schedule",
-        demo: '<div class="field"><label class="field-label" for="basic-date">Start date</label><input class="input" id="basic-date" type="date" value="2026-09-16"></div>',
-        specs: [["Field", 40], ["Format", "Day · month · year"], ["State", "Selected"], ["Radius", 8]] }),
-      doc({ name: "Time picker", keys: "clock time schedule reminder",
-        demo: '<div class="field"><label class="field-label" for="basic-time">Reminder time</label><input class="input" id="basic-time" type="time" value="09:30"></div>',
-        specs: [["Field", 40], ["Format", "Local time"], ["State", "Selected"], ["Radius", 8]] })
+        specs: [["Track", 4], ["Thumb", 16], ["Range", "0–100%"], ["Focus", "focus/ring"]] })
     ];
 
     var navigation = [
@@ -972,42 +904,9 @@
     ];
 
     var navigationSurfaces = [
-      doc({ name: "Top app bar", keys: "header toolbar page actions",
-        demo: '<div class="basic-appbar"><strong>Project library</strong><div><button class="btn btn--secondary btn--icon" type="button" aria-label="Search">' + I.search + '</button><button class="btn btn--secondary btn--icon" type="button" aria-label="Notifications">' + I.bell + '</button></div></div>',
-        specs: [["Height", 56], ["Title", "Title"], ["Actions", "1–3"], ["Surface", "bg/surface"]] }),
-      doc({ name: "Bottom app bar", keys: "mobile bottom toolbar actions",
-        demo: '<div class="basic-bottom-bar"><span>Library</span><span>Share</span><button type="button" aria-label="Create">' + I.plus + '</button><span>Save</span><span>More</span></div>',
-        specs: [["Height", 64], ["Actions", "3–5"], ["Primary", "Raised"], ["Placement", "Mobile"]] }),
       doc({ name: "Navigation bar", keys: "mobile nav destinations tabs bottom",
         demo: '<div class="basic-nav-bar"><span class="is-active">Home</span><span>Explore</span><span>Saved</span><span>Profile</span></div>',
-        specs: [["Height", 64], ["Destinations", "3–5"], ["Active", "Tint + label"], ["Placement", "Mobile"]] }),
-      doc({ name: "Navigation rail", keys: "desktop tablet vertical nav destinations",
-        demo: '<div class="basic-rail"><span class="is-active">Home</span><span>Work</span><span>Saved</span></div>',
-        specs: [["Width", 80], ["Destinations", "3–7"], ["Active", "Tint"], ["Placement", "Medium"]] }),
-      doc({ name: "Navigation drawer", keys: "side navigation menu destinations",
-        demo: '<div class="basic-drawer"><strong>Workspace</strong><span class="is-active">Overview</span><span>Libraries</span><span>Settings</span></div>',
-        specs: [["Width", 220], ["Padding", 12], ["Active", "accent/tint"], ["Placement", "Expanded"]] })
-    ];
-
-    var actions = [
-      doc({ name: "Icon button", keys: "icon action compact",
-        demo: '<div class="row"><button class="btn btn--secondary btn--icon" type="button" aria-label="Search">' + I.search + '</button><button class="btn btn--secondary btn--icon" type="button" aria-label="Download">' + I.download + '</button><button class="btn btn--secondary btn--icon" type="button" aria-label="Favorite">' + I.heart + '</button></div>',
-        specs: [["Size", 40], ["Icon", 20], ["Label", "aria-label"], ["Tooltip", "When needed"]] }),
-      doc({ name: "Floating action button", keys: "fab create primary action",
-        demo: '<button class="basic-fab" type="button">' + I.plus + '<span>New project</span></button>',
-        specs: [["Height", 48], ["Icon", 20], ["Label", "Optional"], ["Placement", "Floating"]] }),
-      doc({ name: "Button group", keys: "buttons grouped related actions",
-        demo: '<div class="basic-button-group"><button type="button">List</button><button class="is-active" type="button">Board</button><button type="button">Timeline</button></div>',
-        specs: [["Gap", 1], ["Radius", 8], ["Selected", "Surface"], ["Use", "Related views"]] }),
-      doc({ name: "Split button", keys: "button menu secondary action",
-        demo: '<div class="basic-split-button"><button type="button">Share</button><button type="button" aria-label="More share options">' + I.chevronDown + '</button></div>',
-        specs: [["Height", 40], ["Main action", "Verb"], ["Menu", "Related options"], ["Radius", 8]] }),
-      doc({ name: "Toolbar", keys: "tool bar editing selected actions",
-        demo: '<div class="basic-toolbar"><strong>2 selected</strong><button class="btn btn--secondary btn--icon" type="button" aria-label="Download">' + I.download + '</button><button class="btn btn--secondary btn--icon" type="button" aria-label="Copy">' + I.copy + '</button><button class="btn btn--secondary btn--icon" type="button" aria-label="Delete">' + I.trash + '</button></div>',
-        specs: [["Height", 48], ["Actions", "2–5"], ["Context", "Selection"], ["Surface", "bg/surface"]] }),
-      doc({ name: "Divider", keys: "separator rule grouping",
-        demo: '<div class="basic-divider"><span>Project settings</span><i></i><span>Notifications</span></div>',
-        specs: [["Thickness", 1], ["Colour", "border/default"], ["Inset", "Optional"], ["Use", "Grouping"]] })
+        specs: [["Height", 64], ["Destinations", "3–5"], ["Active", "Tint + label"], ["Placement", "Mobile"]] })
     ];
 
     var feedback = [
@@ -1023,10 +922,6 @@
         demo: '<div class="toast" role="status">' + I.checkCircle + '<span class="toast-text">Project archived</span>' +
           '<button class="toast-action" type="button">Undo</button></div>',
         specs: [["Radius", 8], ["Elevation", 3], ["Surface", "inverse/surface"], ["State", "Visible"]] }),
-      doc({ name: "Tooltip", keys: "hint label hover",
-        demo: '<div class="tooltip-anchor"><span class="tooltip" role="tooltip">Copy link</span>' +
-          '<button class="btn btn--secondary btn--icon" type="button" aria-label="Copy link">' + I.copy + '</button></div>',
-        specs: [["Padding", "6 / 8"], ["Radius", 6], ["Text", "Caption"], ["State", "Visible"]] }),
       doc({ name: "Progress", demoCls: "doc-demo--column", keys: "loader spinner bar loading",
         demo: '<div class="progress-row"><div class="progress-label"><span>Uploading</span><span>64%</span></div>' +
             '<div class="progress" role="progressbar" aria-valuenow="64" aria-valuemin="0" aria-valuemax="100"><span class="progress-bar" style="width:64%"></span></div></div>' +
@@ -1034,10 +929,6 @@
             '<div class="progress progress--indeterminate" role="progressbar" aria-label="Preparing export"><span class="progress-bar"></span></div></div>' +
           '<div class="row"><span class="spinner" style="--size:16px"></span><span class="spinner"></span><span class="spinner" style="--size:32px"></span></div>',
         specs: [["Track", 6], ["Radius", "full"], ["Spinner", "16 · 24 · 32"], ["State", "Pending"]] }),
-      doc({ name: "Skeleton", keys: "placeholder loading",
-        demo: '<div class="skeleton-card" aria-hidden="true"><span class="skeleton skeleton--circle"></span>' +
-          '<div class="skeleton-lines"><span class="skeleton" style="width:60%"></span><span class="skeleton"></span><span class="skeleton" style="width:80%"></span></div></div>',
-        specs: [["Line", 10], ["Radius", 6], ["State", "Placeholder"]] }),
       doc({ name: "Badge", keys: "tag status label count",
         demo: '<span class="badge">Draft</span><span class="badge badge--accent">New</span><span class="badge badge--solid">Beta</span>' +
           '<span class="badge badge--success"><span class="badge-dot"></span>Live</span><span class="badge badge--warning">Pending</span>' +
@@ -1047,13 +938,6 @@
     ];
 
     var content = [
-      doc({ name: "Chip", keys: "filter tag pill",
-        demo: '<button class="chip" type="button" aria-pressed="false" data-chip>Design</button>' +
-          '<button class="chip is-hover" type="button" aria-pressed="false" data-chip>Research</button>' +
-          '<button class="chip" type="button" aria-pressed="true" data-chip>' + I.check + 'Prototype</button>' +
-          '<span class="chip">Figma<span class="chip-remove" role="button" tabindex="0" aria-label="Remove Figma">' + I.x + '</span></span>' +
-          '<button class="chip" type="button" disabled>Archived</button>',
-        specs: [["Height", 32], ["Padding", 12], ["Radius", "full"], ["Label", "Label · Medium"], ["Icon", 14]] }),
       doc({ name: "Avatar", keys: "profile user initials people",
         demo: '<span class="avatar" style="--size:24px">AK</span><span class="avatar" style="--size:32px">AK</span>' +
           '<span class="avatar">AK</span><span class="avatar" style="--size:56px">AK<span class="avatar-status"></span></span>' +
@@ -1079,60 +963,23 @@
     var overlays = [
       doc({ name: "Menu", keys: "overflow context options",
         demo: '<div class="menu" role="menu" aria-label="Project options"><button class="menu-item" type="button" role="menuitem">Rename</button><button class="menu-item" type="button" role="menuitem">Duplicate</button><div class="menu-divider"></div><button class="menu-item" type="button" role="menuitem">Archive</button></div>',
-        specs: [["Item", 36], ["Padding", 4], ["Radius", 8], ["Elevation", 3]] }),
-      doc({ name: "Bottom sheet", keys: "mobile sheet panel actions",
-        demo: '<div class="basic-sheet basic-sheet--bottom"><i></i><strong>Project actions</strong><span>Duplicate, share or archive this project.</span><button class="btn btn--secondary btn--sm" type="button">View actions</button></div>',
-        specs: [["Radius", "16 top"], ["Padding", 20], ["Handle", "Visible"], ["Placement", "Mobile"]] }),
-      doc({ name: "Side sheet", keys: "side panel supporting details",
-        demo: '<div class="basic-sheet basic-sheet--side"><strong>Details</strong><span>Owner: Ava Kim</span><span>Updated today</span><button class="btn btn--secondary btn--sm" type="button">Close</button></div>',
-        specs: [["Width", 260], ["Padding", 20], ["Elevation", 3], ["Placement", "Desktop"]] }),
-      doc({ name: "Carousel", keys: "gallery collection cards browse",
-        demo: '<div class="basic-carousel"><article class="is-current"><span>01</span><strong>Foundations</strong></article><article><span>02</span><strong>Components</strong></article><article><span>03</span><strong>Patterns</strong></article></div>',
-        specs: [["Visible item", "1 + preview"], ["Gap", 12], ["Radius", 12], ["Use", "Collections"]] })
+        specs: [["Item", 36], ["Padding", 4], ["Radius", 8], ["Elevation", 3]] })
     ];
 
-    var basics = [
-      doc({ name: "Buttons", span: true, keys: "primary secondary outline ghost danger link variants",
-        demo: D.BUTTON_VARIANTS.map(function (v) {
-          return cell(v.name, '<button class="btn btn--' + v.id + '" type="button">Button</button>');
-        }).join("") }),
-      doc({ name: "Button sizes", keys: "small medium large height",
-        demo: D.BUTTON_SIZES.map(function (size) {
-          return cell(size.name + ' · ' + size.height, '<button class="btn btn--primary ' + size.cls + '" type="button">Button</button>');
-        }).join("") }),
-      doc({ name: "Button states", wide: true, keys: "default hover pressed focused selected disabled loading",
-        demo: D.BUTTON_STATES.map(function (state) {
-          return cell(state.name, '<button class="btn btn--primary ' + (state.cls || '') + '" type="button"' +
-            (state.disabled ? ' disabled' : '') + (state.id === "loading" ? ' aria-busy="true"' : '') + '>Button</button>');
-        }).join("") })
-    ];
-
-    inputs.push(doc({ name: "Text area", keys: "textarea multiline form input",
-      demo: '<div class="field"><label class="field-label" for="basic-description">Description</label><textarea class="input basic-textarea" id="basic-description" rows="3" placeholder="Add a description"></textarea></div>',
-      specs: [["Radius", 8], ["Padding", 12]] }));
-    inputs.push(doc({ name: "File upload", keys: "attachment dropzone file input",
-      demo: '<label class="basic-upload">' + I.plus + '<span>Choose a file</span><input type="file" aria-label="Choose a file"></label>' }));
-    navigation.push(doc({ name: "Breadcrumbs", keys: "breadcrumb path hierarchy",
-      demo: '<nav class="basic-breadcrumb" aria-label="Breadcrumb example"><span>Home</span>' + I.chevronRight + '<span>Projects</span>' + I.chevronRight + '<strong aria-current="page">Aurora</strong></nav>' }));
-    navigation.push(doc({ name: "Pagination", keys: "pages next previous",
-      demo: '<nav class="basic-pagination" aria-label="Pagination example"><button class="btn btn--ghost btn--sm" type="button" aria-label="Previous page" disabled>‹</button><button class="btn btn--secondary btn--sm" type="button" aria-current="page">1</button><button class="btn btn--ghost btn--sm" type="button">2</button><button class="btn btn--ghost btn--sm" type="button">3</button><button class="btn btn--ghost btn--sm" type="button" aria-label="Next page">›</button></nav>' }));
     feedback.push(doc({ name: "Empty state", keys: "empty no results placeholder",
       demo: '<div class="basic-empty">' + I.search + '<strong>No projects yet</strong><button class="btn btn--primary btn--sm" type="button">' + I.plus + 'New project</button></div>' }));
-    // Keep each specimen with its visual family.
-    overlays.unshift(content.pop());
-    content.push(overlays.pop());
-    content.push(doc({ name: "Accordion", keys: "accordion disclosure expand collapse details",
-      demo: '<div class="basic-accordion"><details open><summary>Project details</summary><p>Owner: Ava Kim</p></details><details><summary>Notifications</summary><p>Email updates enabled</p></details></div>' }));
-    content.push(doc({ name: "Table", keys: "table data rows columns status",
-      demo: '<div class="table-scroll basic-table"><table class="table"><thead><tr><th>Name</th><th>Status</th></tr></thead><tbody><tr><td class="strong">Aurora</td><td><span class="badge badge--success">Active</span></td></tr><tr><td class="strong">Orbit</td><td><span class="badge">Draft</span></td></tr></tbody></table></div>' }));
-
+    var everything = [].concat(inputs, pickers, navigation, navigationSurfaces, feedback, content, overlays);
+    function pick(names) {
+      return names.map(function (n) {
+        return everything.filter(function (html) { return html.indexOf('<h3 class="doc-title">' + n + '</h3>') !== -1; })[0];
+      }).filter(Boolean);
+    }
     var families = [
-      { id: "actions", name: "Actions", items: basics.concat(actions) },
-      { id: "inputs", name: "Inputs & selection", items: inputs.concat(pickers) },
-      { id: "navigation", name: "Navigation", items: navigation.concat(navigationSurfaces) },
-      { id: "feedback", name: "Feedback", items: feedback },
-      { id: "content", name: "Content", items: content },
-      { id: "overlays", name: "Surfaces & overlays", items: overlays }
+      { id: "inputs", name: "Inputs", items: pick(["Text field", "Select", "Checkbox", "Radio", "Switch", "Slider"]) },
+      { id: "navigation", name: "Navigation", items: pick(["Tabs", "Segmented control", "Navigation bar"]) },
+      { id: "feedback", name: "Feedback", items: pick(["Alert", "Toast", "Progress", "Empty state"]) },
+      { id: "content", name: "Content", items: pick(["Badge", "Avatar", "List", "Card"]) },
+      { id: "overlays", name: "Overlays", items: pick(["Dialog", "Menu"]) }
     ];
     $("body-components").innerHTML =
       filterBar("component-jumps", "Component filters", "data-component-filter",
@@ -1566,16 +1413,6 @@
       return;
     }
 
-    var searchTrigger = t.closest(".search-trigger");
-    if (searchTrigger) {
-      var input = loadSearchInput();
-      var searchPanel = input.closest(".search");
-      searchPanel.classList.add("is-open");
-      searchTrigger.setAttribute("aria-expanded", "true");
-      requestAnimationFrame(function () { input.focus(); });
-      return;
-    }
-
     var navLink = t.closest(".nav-link");
     if (navLink) { show(navLink.getAttribute("data-section")); setNavOpen(false); window.scrollTo(0, 0); return; }
 
@@ -1616,6 +1453,7 @@
       var filterPage = pageFilterBtn.closest(".page");
       pageFilters[filterPage.id] = pageFilterBtn.getAttribute("data-page-filter");
       applyPageFilter(filterPage);
+      applyFilter();
       revealFilters("#" + filterPage.id + " .page-filters");
       return;
     }
@@ -1627,7 +1465,7 @@
         button.setAttribute("aria-pressed", button === componentFilter ? "true" : "false");
       });
       document.querySelectorAll(".component-family").forEach(function (family) {
-        family.hidden = filter !== "all" && family.id !== "components-" + filter;
+        family.classList.toggle("is-filtered-out", filter !== "all" && family.id !== "components-" + filter);
       });
       if (searchInput) { searchInput.value = ""; applyFilter(); }
       revealFilters(".component-jumps");
@@ -1710,6 +1548,16 @@
   } catch (err) {}
   if (saved.platform === "mobile") { platform = "mobile"; }
 
+  /* search is always in the top bar: it filters the cards on the page you are on */
+  searchInput = $("search");
+  searchInput.addEventListener("input", applyFilter);
+  searchInput.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    this.value = "";
+    applyFilter();
+    this.blur();
+  });
+
   loadSaved();
   renderNav();
   renderPages();
@@ -1718,6 +1566,10 @@
   renderColors();
   renderAnimations();
   renderPrinciples();
+  renderHeuristics();
+  renderResearch();
+  renderPatterns();
+  renderProduct();
   renderVariables();
   renderButtons();
   renderComponents();
