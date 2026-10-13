@@ -146,16 +146,17 @@
   function renderNav() {
     var groups = [];
     D.SECTIONS.forEach(function (s) {
+      if (s.nav === false) return;
       var g = groups.filter(function (x) { return x.name === s.group; })[0];
       if (!g) { g = { name: s.group, items: [] }; groups.push(g); }
       g.items.push(s);
     });
     $("nav").innerHTML = groups.map(function (g) {
-      return '<div class="nav-group"><span class="nav-label">' + g.name + '</span>' +
+      return '<div class="nav-group"' + (g.name ? ' role="group" aria-label="' + g.name + '"' : "") + '>' +
+        (g.name ? '<span class="nav-label">' + g.name + '</span>' : "") +
         g.items.map(function (s) {
           return '<button class="nav-link" type="button" data-section="' + s.id + '">' +
-            '<span class="nav-link-main">' + (I[s.icon] || "") + '<span>' + s.name + '</span></span>' +
-            (s.id === "saved" ? '<span class="nav-link-count" id="saved-count"></span>' : "") + '</button>';
+            '<span class="nav-link-main">' + (I[s.icon] || "") + '<span>' + s.name + '</span></span>' + '</button>';
         }).join("") + '</div>';
     }).join("");
   }
@@ -195,10 +196,11 @@
   }
 
   function show(id) {
+    if (id === "product") { id = "prioritisation"; }
     if (!$("page-" + id)) { id = "typography"; }
     current = id;
     D.SECTIONS.forEach(function (s) { $("page-" + s.id).hidden = s.id !== id; });
-    document.querySelectorAll(".nav-link").forEach(function (l) {
+    document.querySelectorAll(".nav-link, .topbar-saved").forEach(function (l) {
       if (l.getAttribute("data-section") === id) { l.setAttribute("aria-current", "page"); }
       else { l.removeAttribute("aria-current"); }
     });
@@ -374,22 +376,37 @@
   }
 
   /* ================= ANIMATIONS ================= */
-  function motionCard(name, id) {
-    return '<article class="card motion-card" data-name="' + key([name, "animation motion"]) + '">' +
+  function motionCard(name, id, text) {
+    return '<article class="card motion-card" data-name="' + key([name, text, "animation motion"]) + '">' +
       '<h3 class="doc-title">' + name + '</h3>' +
       '<div class="motion-stage"><span class="motion-object motion-object--' + id + '"></span></div>' +
+      '<p class="motion-caption">' + text + '</p>' +
     '</article>';
   }
 
   function renderAnimations() {
     var entrances = [
-      ["Fade", "fade"], ["Slide up", "slide-up"], ["Scale", "scale"], ["Pop", "pop"]
+      ["Fade", "fade", "Appears and disappears in place. For tooltips, overlays and quiet changes."],
+      ["Slide up", "slide-up", "Rises into place from below. For sheets, toasts and new list items."],
+      ["Scale", "scale", "Grows from a smaller size. For menus and popovers opening from a control."],
+      ["Pop", "pop", "Springs slightly past full size, then settles. For confirmations and new badges."]
     ];
-    var attention = [["Bounce", "bounce"], ["Shake", "shake"], ["Pulse", "pulse"]];
-    var loops = [["Loading", "loading"], ["Shimmer", "shimmer"]];
-    var effects = [["Ripple", "ripple"], ["Glow", "glow"], ["Float", "float"]];
+    var attention = [
+      ["Bounce", "bounce", "Hops up and down to draw the eye. Use sparingly, for one thing that needs noticing."],
+      ["Shake", "shake", "Moves side to side. For an error, such as a wrong password."],
+      ["Pulse", "pulse", "Gently grows and fades back. For live or unread status."]
+    ];
+    var loops = [
+      ["Loading", "loading", "Spins while work happens. For short waits of unknown length."],
+      ["Shimmer", "shimmer", "A light sweep across placeholder shapes. For content that is on its way."]
+    ];
+    var effects = [
+      ["Ripple", "ripple", "A ring spreads out from the touch point. For taps and presses."],
+      ["Glow", "glow", "A soft halo that expands and fades. For focus and highlighting."],
+      ["Float", "float", "Drifts up and down slowly. For hero artwork and empty states."]
+    ];
     function motionGroup(title, list) {
-      return group(title, null, null, '<div class="motion-grid">' + list.map(function (item) { return motionCard(item[0], item[1]); }).join("") + '</div>');
+      return group(title, null, null, '<div class="motion-grid">' + list.map(function (item) { return motionCard(item[0], item[1], item[2]); }).join("") + '</div>');
     }
     familyPage("animations", "Animation filters", [
       { id: "entrance", name: "Entrance", content: motionGroup("Entrance", entrances) },
@@ -397,6 +414,11 @@
       { id: "loading", name: "Loading", content: motionGroup("Loading", loops) },
       { id: "effects", name: "Effects", content: motionGroup("Effects", effects) }
     ]);
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      $("body-animations").insertAdjacentHTML("afterbegin", '<div class="motion-note">' +
+        '<span>Your device is set to reduce motion, so these are paused.</span>' +
+        '<button class="btn btn--secondary btn--sm" type="button" data-play-motion>Play them anyway</button></div>');
+    }
   }
 
   /* ================= PRINCIPLES ================= */
@@ -588,10 +610,12 @@
         });
       });
     }
-    familyPage("product", "Product filters", [
-      { id: "prioritise", name: "Prioritisation", content: refGroup("Prioritisation", frameworks("prioritise"), true) },
-      { id: "metrics", name: "Metrics", content: refGroup("Metrics", frameworks("metrics"), true) }
-    ]);
+    /* one list per page, so no filter bar and no second heading under the page title */
+    function list(cards) {
+      return '<section class="group"><div class="ref-grid ref-grid--wide">' + cards.join("") + '</div></section>';
+    }
+    $("body-prioritisation").innerHTML = list(frameworks("prioritise"));
+    $("body-metrics").innerHTML = list(frameworks("metrics"));
   }
 
   function applyColorFilter() {
@@ -1398,7 +1422,7 @@
     if (t.closest("#menu-trigger")) { setNavOpen(true); $("sidebar-close").focus(); return; }
     if (t.closest("#sidebar-close") || t.closest("#scrim")) { setNavOpen(false); $("menu-trigger").focus(); return; }
 
-    var backTrigger = t.closest("#back-trigger");
+    var backTrigger = t.closest(".back-trigger");
     if (backTrigger) {
       window.history.back();
       return;
@@ -1413,7 +1437,7 @@
       return;
     }
 
-    var navLink = t.closest(".nav-link");
+    var navLink = t.closest(".nav-link, .topbar-saved");
     if (navLink) { show(navLink.getAttribute("data-section")); setNavOpen(false); window.scrollTo(0, 0); return; }
 
     var typographyFilterBtn = t.closest("[data-typography-filter]");
@@ -1445,6 +1469,13 @@
       variableFilter = variableFilterBtn.getAttribute("data-variable-filter");
       applyVariableFilter();
       revealFilters(".variable-filters");
+      return;
+    }
+
+    var playMotion = t.closest("[data-play-motion]");
+    if (playMotion) {
+      $("page-animations").classList.add("motion-allowed");
+      playMotion.closest(".motion-note").remove();
       return;
     }
 

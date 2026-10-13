@@ -495,15 +495,15 @@ body{background:var(--bg);}
 .law-diagram--standout i:nth-child(3){width:20px;height:20px;background:var(--accent);}
 
 .principle-card p{margin:0;color:var(--text-secondary);font-size:var(--body-size);line-height:var(--body-line);}
-.motion-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:30px;}
+.motion-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:30px;}
 .motion-card{padding:24px;gap:16px;}
 .motion-stage{display:grid;place-items:center;min-height:128px;border-radius:var(--radius-md);background:var(--surface-sunken);overflow:hidden;}
 .motion-object{display:block;width:38px;height:38px;border-radius:var(--radius-md);background:var(--accent);}
-.motion-object--fade{animation:motion-fade 1.8s ease-in-out infinite alternate;}
-.motion-object--slide-up{animation:motion-slide-up 1.8s var(--ease-standard) infinite alternate;}
+.motion-object--fade{animation:motion-fade 2.4s ease-in-out infinite;}
+.motion-object--slide-up{animation:motion-slide-up 2.4s var(--ease-enter) infinite;}
 
-.motion-object--scale{animation:motion-scale 1.8s var(--ease-standard) infinite alternate;}
-.motion-object--pop{animation:motion-pop 1.8s var(--ease-standard) infinite alternate;}
+.motion-object--scale{animation:motion-scale 2.4s var(--ease-enter) infinite;}
+.motion-object--pop{animation:motion-pop 2.4s var(--ease-standard) infinite;}
 .motion-object--bounce{animation:motion-bounce 1.4s ease-in-out infinite;}
 .motion-object--shake{animation:motion-shake 1.2s ease-in-out infinite;}
 
@@ -515,7 +515,19 @@ body{background:var(--bg);}
 .motion-object--loading{width:36px;height:36px;border:4px solid var(--border-strong);border-top-color:var(--accent);border-radius:50%;background:transparent;animation:motion-rotate 1s linear infinite;}
 .motion-object--shimmer{width:70%;height:14px;background:linear-gradient(90deg,var(--surface-pressed) 0%,var(--surface) 45%,var(--surface-pressed) 100%);background-size:200% 100%;animation:motion-shimmer 1.4s linear infinite;}
 
-@media (prefers-reduced-motion:reduce){.motion-object{animation:none !important;}}
+@keyframes motion-fade{0%{opacity:0}30%,75%{opacity:1}100%{opacity:0}}
+@keyframes motion-slide-up{0%{transform:translateY(32px);opacity:0}30%,75%{transform:none;opacity:1}100%{transform:none;opacity:0}}
+@keyframes motion-scale{0%{transform:scale(.4);opacity:0}30%,75%{transform:none;opacity:1}100%{transform:none;opacity:0}}
+@keyframes motion-pop{0%{transform:scale(.4);opacity:0}18%{transform:scale(1.2);opacity:1}32%,75%{transform:none;opacity:1}100%{transform:none;opacity:0}}
+@keyframes motion-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-22px)}}
+@keyframes motion-shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+@keyframes motion-pulse{0%,100%{transform:scale(1);opacity:.75}50%{transform:scale(1.22);opacity:1}}
+@keyframes motion-ripple{0%{transform:scale(.5);opacity:1}100%{transform:scale(2.5);opacity:0}}
+@keyframes motion-glow{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 60%,transparent)}100%{box-shadow:0 0 0 20px transparent}}
+@keyframes motion-float{0%,100%{transform:translateY(8px)}50%{transform:translateY(-16px)}}
+@keyframes motion-rotate{to{transform:rotate(360deg)}}
+@keyframes motion-shimmer{from{background-position:200% 0}to{background-position:-100% 0}}
+@media (prefers-reduced-motion:reduce){#page-animations:not(.motion-allowed) .motion-object{animation:none !important;}}
 /* One filter control for every page: a white pill bar, scrolls sideways instead of wrapping. */
 .filter-bar{display:flex;width:max-content;max-width:100%;gap:2px;padding:4px;margin-bottom:44px;border:1px solid var(--border);border-radius:var(--radius-full);background:var(--surface);overflow-x:auto;scrollbar-width:none;}
 .filter-bar::-webkit-scrollbar{display:none;}
@@ -749,7 +761,6 @@ body{background:var(--bg);}
    Top bar: search lives here, on every screen size.
    The sidebar is only as wide as its widest label.
    ============================================================ */
-.content{display:flex;flex-direction:column;min-width:0;}
 .topbar{
   position:sticky;top:0;z-index:30;
   background:color-mix(in srgb,var(--bg) 82%,transparent);
@@ -763,7 +774,7 @@ body{background:var(--bg);}
 .topbar-page{font-size:var(--body-lg-size);font-weight:var(--weight-semibold);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
 .search{
-  position:relative;display:flex;align-items:center;gap:8px;width:min(360px,100%);height:40px;padding:0 12px;
+  position:relative;display:flex;align-items:center;gap:8px;flex:1;min-width:0;height:40px;padding:0 12px;
   border-radius:12px;background:var(--fill);color:var(--text-tertiary);cursor:text;
   transition:background-color var(--duration-fast) var(--ease-standard),box-shadow var(--duration-fast) var(--ease-standard);
 }
@@ -792,3 +803,65 @@ body{background:var(--bg);}
 .nav-link-main{display:flex;align-items:center;gap:12px;min-width:0;}
 .nav-link-main svg{width:var(--icon-md);height:var(--icon-md);flex:none;color:var(--text-tertiary);transition:color var(--duration-fast) var(--ease-standard);}
 .nav-link:hover .nav-link-main svg,.nav-link[aria-current="page"] .nav-link-main svg{color:var(--text);}
+
+@keyframes page-in{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+@keyframes var-track-sweep{from{left:0}to{left:calc(100% - 8px)}}
+
+.motion-caption{margin:0;font-size:var(--body-size);line-height:var(--body-line);color:var(--text-secondary);}
+.motion-note{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:32px;padding:16px 20px;border-radius:var(--radius-lg);background:var(--surface);font-size:var(--body-size);color:var(--text-secondary);}
+
+/* ---------- sidebar groups: UI, UX, Product ---------- */
+.nav{gap:24px;}
+.nav-group{gap:2px;}
+.nav-label{
+  display:block;padding:0 12px 8px;
+  font-size:var(--overline-size);line-height:var(--overline-line);font-weight:var(--weight-bold);
+  letter-spacing:.08em;text-transform:uppercase;color:var(--text);
+}
+/* desktop: a little tighter so all three groups and Save here fit a laptop screen without scrolling */
+@media (min-width:961px){
+  .nav{gap:20px;}
+  .nav-link{height:36px;}
+}
+/* Save here stays in view even when the list is taller than the window */
+.sidebar{padding-bottom:0;}
+.save{position:sticky;bottom:0;margin-top:auto;padding:12px 0 20px;background:var(--bg);}
+@media (min-width:961px){
+  .nav-link{height:34px;}
+}
+
+/* ---------- Saved: beside search, in the top bar ---------- */
+.topbar-saved{
+  display:inline-flex;align-items:center;gap:8px;flex:none;height:40px;padding:0 14px;
+  border:0;border-radius:12px;background:var(--fill);color:var(--text);
+  font-size:var(--body-size);font-weight:var(--weight-medium);cursor:pointer;
+  transition:background-color var(--duration-fast) var(--ease-standard),box-shadow var(--duration-fast) var(--ease-standard);
+}
+.topbar-saved svg{width:var(--icon-md);height:var(--icon-md);flex:none;}
+.topbar-saved:hover{background:var(--fill-strong);}
+.topbar-saved:focus-visible{outline:var(--border-width-strong) solid var(--focus-ring);outline-offset:2px;}
+.topbar-saved[aria-current="page"]{background:var(--surface);font-weight:var(--weight-semibold);box-shadow:0 1px 2px rgba(0,0,0,.06),0 0 0 .5px var(--hairline);}
+.topbar-saved .nav-link-count{background:var(--surface);}
+.topbar-saved[aria-current="page"] .nav-link-count{background:var(--fill);}
+@media (max-width:960px){
+  .topbar-saved{width:var(--touch-min);height:var(--touch-min);justify-content:center;padding:0;position:relative;}
+  .topbar-saved-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;}
+  .topbar-saved .nav-link-count{position:absolute;top:2px;right:2px;min-width:18px;padding:0 5px;font-size:var(--overline-size);line-height:18px;}
+  .topbar-inner:has(.search input:focus) .topbar-saved{display:none;}
+}
+
+/* ============================================================
+   Header layout: one bar across the top, the sidebar always below it.
+   Logo, search and Saved sit together in the middle of the bar.
+   ============================================================ */
+:root{--topbar-h:65px;}
+.topbar-brand{display:none;}
+.topbar-inner{width:100%;}
+@media (min-width:961px){
+  .shell{grid-template-rows:auto 1fr;}
+  .topbar{grid-column:1 / -1;grid-row:1;}
+  .sidebar{grid-column:1;grid-row:2;top:var(--topbar-h);height:calc(100vh - var(--topbar-h));height:calc(100dvh - var(--topbar-h));padding-top:20px;}
+  .main{grid-column:2;grid-row:2;min-width:0;}
+  .topbar-brand{display:flex;align-items:center;gap:10px;flex:none;}
+  .sidebar-head{display:none;}
+}

@@ -12,13 +12,39 @@
   <link rel="stylesheet" href="css/base.css?v=142d55fd">
   <link rel="stylesheet" href="css/buttons.css?v=b035f32a">
   <link rel="stylesheet" href="css/components.css?v=168e7809">
-  <link rel="stylesheet" href="css/site.css?v=9221010e">
+  <link rel="stylesheet" href="css/site.css?v=b99c023f">
 </head>
 <body>
   <div class="shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="topbar-brand">
+          <button class="back-trigger" type="button" aria-label="Back to portfolio">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/><path d="M8 12h10"/></svg>
+          </button>
+          <a class="brand" href="#components">
+            <span class="brand-text"><span class="brand-sub">Toolkit</span></span>
+          </a>
+        </div>
+        <button class="menu-trigger" id="menu-trigger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+        <span class="topbar-title"><span class="topbar-sub">Toolkit</span><span class="topbar-page" id="menubar-page"></span></span>
+        <label class="search" for="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>
+          <input id="search" type="search" aria-label="Search this page" placeholder="Search" autocomplete="off">
+        </label>
+        <button class="topbar-saved" type="button" data-section="saved" aria-label="Saved">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h10v16l-5-4-5 4z"/></svg>
+          <span class="topbar-saved-label">Saved</span>
+          <span class="nav-link-count" id="saved-count"></span>
+        </button>
+      </div>
+    </header>
+
     <aside class="sidebar" id="sidebar" aria-label="Toolkit navigation">
       <div class="sidebar-head">
-        <button class="back-trigger" id="back-trigger" type="button" aria-label="Back to portfolio">
+        <button class="back-trigger" type="button" aria-label="Back to portfolio">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/><path d="M8 12h10"/></svg>
         </button>
         <a class="brand" href="#components">
@@ -78,24 +104,10 @@
     </dialog>
     <div class="save-toast" id="toast" role="status" aria-live="polite" hidden></div>
 
-    <div class="content">
-      <header class="topbar">
-        <div class="topbar-inner">
-          <button class="menu-trigger" id="menu-trigger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-          </button>
-          <span class="topbar-title"><span class="topbar-sub">Toolkit</span><span class="topbar-page" id="menubar-page"></span></span>
-          <label class="search" for="search">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>
-            <input id="search" type="search" aria-label="Search this page" placeholder="Search" autocomplete="off">
-          </label>
-        </div>
-      </header>
-      <main class="main" id="pages"></main>
-    </div>
+    <main class="main" id="pages"></main>
   </div>
 
-  <script src="js/data.js?v=3000d9d7"></script>
-  <script src="js/app.js?v=e32fb379"></script>
+  <script src="js/data.js?v=414a8e56"></script>
+  <script src="js/app.js?v=dda1a291"></script>
 </body>
 </html>

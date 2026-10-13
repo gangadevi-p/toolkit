@@ -48,34 +48,37 @@
     navHeuristics: icon('<path d="M10 6h10M10 12h10M10 18h10"/><path d="M3.5 6l1.2 1.2L7 4.8M3.5 12l1.2 1.2L7 10.8M3.5 18l1.2 1.2L7 16.8"/>'),
     navResearch: icon('<circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M16 5.2a3 3 0 0 1 0 5.6M18 20a6 6 0 0 0-3-5.2"/>'),
     navPatterns: icon('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/>'),
-    navProduct: icon('<path d="M5 20v-8M12 20V5M19 20v-11"/>')
+    navPrioritisation: icon('<path d="M4 6h8M4 12h6M4 18h4"/><path d="M17 20V5M13 9l4-4 4 4"/>'),
+    navMetrics: icon('<path d="M5 20v-8M12 20V5M19 20v-11"/>')
   };
 
   /* ================= SECTIONS ================= */
   var SECTIONS = [
-    { id: "components", icon: "navComponents", group: "Sections", name: "Components",
+    { id: "components", icon: "navComponents", group: "UI", name: "Components",
       intro: "The essentials, with their states and sizes." },
-    { id: "animations", icon: "navAnimations", group: "Sections", name: "Animations",
-      intro: "Twelve motions that cover most interfaces." },
-    { id: "buttons", icon: "navButtons", group: "Sections", name: "Buttons",
+    { id: "buttons", icon: "navButtons", group: "UI", name: "Buttons",
       intro: "Six types, three sizes, seven states." },
-    { id: "colors", icon: "navColors", group: "Sections", name: "Colors",
+    { id: "colors", icon: "navColors", group: "UI", name: "Colors",
       intro: "Black, white and grey. Nothing else." },
-    { id: "typography", icon: "navTypography", group: "Sections", name: "Typography",
+    { id: "typography", icon: "navTypography", group: "UI", name: "Typography",
       intro: "One typeface. Ten styles." },
-    { id: "variables", icon: "navVariables", group: "Sections", name: "Variables",
+    { id: "variables", icon: "navVariables", group: "UI", name: "Variables",
       intro: "Every value, ready to use as a Figma variable." },
-    { id: "principles", icon: "navPrinciples", group: "Sections", name: "Principles",
+    { id: "animations", icon: "navAnimations", group: "UI", name: "Animations",
+      intro: "Twelve motions that cover most interfaces." },
+    { id: "principles", icon: "navPrinciples", group: "UX", name: "Principles",
       intro: "What good design asks of you." },
-    { id: "heuristics", icon: "navHeuristics", group: "Sections", name: "Heuristics",
+    { id: "heuristics", icon: "navHeuristics", group: "UX", name: "Heuristics",
       intro: "Ten rules to judge any interface." },
-    { id: "research", icon: "navResearch", group: "Sections", name: "Research",
+    { id: "research", icon: "navResearch", group: "UX", name: "Research",
       intro: "Eight ways to learn from people." },
-    { id: "patterns", icon: "navPatterns", group: "Sections", name: "Patterns",
+    { id: "patterns", icon: "navPatterns", group: "UX", name: "Patterns",
       intro: "Eight screens almost every product needs." },
-    { id: "product", icon: "navProduct", group: "Sections", name: "Product",
-      intro: "What to build first, and how to know it worked." },
-    { id: "saved", icon: "bookmark", group: "Sections", name: "Saved",
+    { id: "prioritisation", icon: "navPrioritisation", group: "Product", name: "Prioritisation",
+      intro: "How to decide what to build first." },
+    { id: "metrics", icon: "navMetrics", group: "Product", name: "Metrics",
+      intro: "How to know it worked." },
+    { id: "saved", icon: "bookmark", nav: false, group: "", name: "Saved",
       intro: "Your notes. Kept on this device only." }
   ];
 
