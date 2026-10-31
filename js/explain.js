@@ -191,5 +191,15 @@
     "SUS": ["A standard usability questionnaire", "The System Usability Scale: ten questions people answer after using a product, scored out of 100.", "After usability tests and between releases.", "It gives one comparable score. Around 68 is average."]
   };
 
+  EXPLAIN.resources = {
+    "§Tools": ["Software that does the work for you", "Apps, plugins and AI helpers that speed up design: Figma plugins, AI assistants and free alternatives to paid software.", "When you are stuck on a repetitive task, or want to see what other designers use.", "The right tool saves hours and lets you spend your time thinking instead of clicking."],
+    "§Websites": ["Places to find inspiration and work", "Sites to browse for ideas, free assets, moodboards and design jobs.", "When you need ideas to get started, references for a project, or places to look for work.", "Seeing great work trains your eye, and good references speed up every project."],
+    "§Typography": ["Choosing and pairing fonts", "Guides on fonts, font pairs and how to set text so it looks good and is easy to read.", "When picking fonts for a new design, or when text looks off and you cannot say why.", "Text is most of what people see. Good type choices make a design look professional."],
+    "§Colour": ["Picking colours that work together", "Tools and tips for building colour palettes, shades and off-whites.", "When starting a palette, or when a design feels flat or harsh.", "Good colour sets the mood, guides attention and keeps text readable."],
+    "§UI & UX": ["How to design screens and experiences", "Terms, checklists, laws, mistakes to avoid and cheat sheets for interface and experience design.", "To learn the basics, check your work before it ships, or look up a word you do not know.", "Knowing the rules and the vocabulary helps you design with confidence and talk to your team."],
+    "§AI for design": ["Using AI as a design helper", "Ways to use AI tools to come up with ideas, images, code and layouts faster.", "When you want to speed up first drafts, explore options or automate boring tasks.", "AI handles the repetitive parts so you can spend time on the decisions that need a human."],
+    "§Career": ["Growing as a designer", "Guides on skills, learning plans, portfolios, jobs and what employers look for.", "When planning what to learn next, preparing for jobs, or deciding your direction.", "A clear plan turns scattered learning into steady progress toward the job you want."]
+  };
+
   global.EXPLAIN = EXPLAIN;
 })(window);
