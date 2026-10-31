@@ -224,3 +224,36 @@ button,a,input,select,textarea,summary,[role="button"]{touch-action:manipulation
 /* ---------- Account page ---------- */
 .account-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:6px;}
 .account-actions .btn{height:var(--touch-min);padding:0 24px;border-radius:14px;}
+
+/* ============================================================
+   Plain-language explainers: heading, definition, when, why
+   ============================================================ */
+.explain-heading{
+  margin:2px 0 0;font-size:var(--body-lg-size);line-height:24px;font-weight:var(--weight-semibold);
+  letter-spacing:-.01em;color:var(--text-secondary);text-wrap:balance;
+}
+.explain-wrap{display:flex;flex-direction:column;gap:12px;margin:-12px 0 4px;max-width:760px;}
+.explain-wrap .explain-heading{margin:0;font-size:var(--title-size);line-height:var(--title-line);color:var(--text);}
+.explain{
+  display:flex;flex-direction:column;gap:14px;margin:6px 0 0;padding:16px 18px;
+  border-radius:18px;background:var(--fill);
+}
+.explain > div{display:grid;grid-template-columns:96px minmax(0,1fr);gap:4px 16px;align-items:baseline;}
+.explain dt{
+  font-size:var(--caption-size);line-height:var(--caption-line);font-weight:var(--weight-semibold);
+  letter-spacing:.02em;color:var(--text-tertiary);
+}
+.explain dd{margin:0;font-size:var(--body-size);line-height:22px;color:var(--text);text-wrap:pretty;}
+.explain--group{background:var(--surface);box-shadow:var(--lift);}
+@media (max-width:600px){
+  .explain > div{grid-template-columns:minmax(0,1fr);gap:2px;}
+  .explain dd{font-size:var(--body-lg-size);line-height:24px;}
+}
+/* the plain-language text replaces the older, more technical one-liner */
+.has-explainer .doc-text,.has-explainer .ref-text,.has-explainer .motion-caption,.has-explainer > p:not(.explain-heading){display:none;}
+.has-explainer .doc-body > p:not(.explain-heading){display:none;}
+
+/* inside cards: label above text; as many columns as fit (one in a narrow card, three in a wide one) */
+.explain:not(.explain--group){display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px 24px;}
+.explain:not(.explain--group) > div{grid-template-columns:minmax(0,1fr);gap:3px;}
+.explain:not(.explain--group) dd{font-size:var(--body-size);line-height:22px;}

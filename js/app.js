@@ -1894,10 +1894,65 @@
   renderComponents();
   show(location.hash.slice(1) || "components");
 
+  /* ================= PLAIN-LANGUAGE EXPLAINERS =================
+     Every concept gets a heading, a definition, when to use it and why. The words live in js/explain.js. */
+  var EXPLAIN_BY_PAGE = {};
+  (function () {
+    var src = window.EXPLAIN || {};
+    Object.keys(src).forEach(function (page) {
+      EXPLAIN_BY_PAGE[page] = {};
+      Object.keys(src[page]).forEach(function (k) { EXPLAIN_BY_PAGE[page][plain(k)] = src[page][k]; });
+    });
+  })();
+
+  function plain(text) {
+    return String(text || "").replace(/[\u2018\u2019]/g, "'").replace(/\s+/g, " ").trim().toLowerCase();
+  }
+
+  function explainList(e, isGroup) {
+    function row(label, text) { return '<div><dt>' + label + '</dt><dd>' + esc(text) + '</dd></div>'; }
+    return '<dl class="explain' + (isGroup ? ' explain--group' : '') + '">' +
+      row("Definition", e[1]) + row("When to use", e[2]) + row("Why use it", e[3]) + '</dl>';
+  }
+
+  function applyExplainers() {
+    document.querySelectorAll("section.page").forEach(function (page) {
+      var map = EXPLAIN_BY_PAGE[page.id.replace(/^page-/, "")];
+      if (!map) return;
+
+      /* a whole section: the heading and list sit right under the section title */
+      page.querySelectorAll(".group-title").forEach(function (title) {
+        var e = map["\u00a7" + plain(title.textContent)];
+        var header = title.closest(".group-header");
+        if (!e || !header || header.hasAttribute("data-explained")) return;
+        header.setAttribute("data-explained", "1");
+        var box = document.createElement("div");
+        box.className = "explain-wrap";
+        box.innerHTML = '<p class="explain-heading">' + esc(e[0]) + '</p>' + explainList(e, true);
+        header.insertAdjacentElement("afterend", box);
+      });
+
+      /* a single card: the heading goes under its title, the list at the bottom */
+      page.querySelectorAll(".card .doc-title, .card .type-name").forEach(function (title) {
+        var e = map[plain(title.textContent)];
+        var card = title.closest(".card");
+        if (!e || !card || card.hasAttribute("data-explained")) return;
+        card.setAttribute("data-explained", "1");
+        card.classList.add("has-explainer");
+        var head = title.closest(".ref-head, .component-card-head, .type-meta") ||
+          (title.parentElement && title.parentElement.classList.contains("row") ? title.parentElement : title);
+        head.insertAdjacentHTML("afterend", '<p class="explain-heading">' + esc(e[0]) + '</p>');
+        card.insertAdjacentHTML("beforeend", explainList(e, false));
+        card.setAttribute("data-name", (card.getAttribute("data-name") || "") + " " + plain(e.join(" ")));
+      });
+    });
+  }
+  applyExplainers();
+
   var thumbFrame = 0;
   new MutationObserver(function () {
     if (thumbFrame) return;
-    thumbFrame = requestAnimationFrame(function () { thumbFrame = 0; syncThumbs(); });
+    thumbFrame = requestAnimationFrame(function () { thumbFrame = 0; applyExplainers(); syncThumbs(); });
   }).observe($("pages"), { subtree: true, childList: true, attributes: true, attributeFilter: ["aria-pressed", "hidden"] });
   window.addEventListener("resize", syncThumbs);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncThumbs);
