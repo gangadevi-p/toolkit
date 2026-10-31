@@ -50,7 +50,8 @@
     navPatterns: icon('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/>'),
     navPrioritisation: icon('<path d="M4 6h8M4 12h6M4 18h4"/><path d="M17 20V5M13 9l4-4 4 4"/>'),
     navMetrics: icon('<path d="M5 20v-8M12 20V5M19 20v-11"/>'),
-    navResources: icon('<path d="M4 5h6a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4z"/><path d="M20 5h-6a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h6z"/>')
+    navResources: icon('<path d="M4 5h6a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4z"/><path d="M20 5h-6a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h6z"/>'),
+    navAccount: icon('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>')
   };
 
   /* ================= SECTIONS ================= */
@@ -81,6 +82,8 @@
       intro: "How to know it worked." },
     { id: "resources", icon: "navResources", group: "Resources", name: "Resources",
       intro: "Tools, sites, fonts and lessons saved from Instagram." },
+    { id: "account", icon: "navAccount", group: "Account", name: "Account",
+      intro: "Sign in to keep your saved items on the server and open them on any device." },
     { id: "saved", icon: "bookmark", nav: false, group: "", name: "Saved",
       intro: "Your notes. Kept on this device only." }
   ];

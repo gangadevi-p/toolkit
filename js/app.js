@@ -1056,28 +1056,23 @@
           '<div class="tg-stack">' + items.map(toolGuide).join("") + '</div></section>'
       };
     });
-    families.push({
-      id: "account",
-      name: "Account",
-      content: '<section class="group"><header class="group-header"><div class="group-head"><h2 class="group-title">Account</h2></div></header>' +
-        '<article class="card saved-card"><div id="account-box"></div></article></section>'
-    });
     familyPage("resources", "Resource categories", families);
-    renderAccount();
   }
 
-  /* Shows whether this device is signed in, with the button to sign in or out. */
+  /* The Account page: whether this device is signed in, with the button to sign in or out. */
   function renderAccount() {
-    var box = $("account-box");
+    var box = $("body-account");
     if (!box) return;
     var signedIn = !!getToken();
-    box.innerHTML = '<h3 class="saved-card-title">' + (signedIn ? "Signed in" : "Not signed in") + '</h3>' +
+    box.innerHTML = '<section class="group"><article class="card saved-card">' +
+      '<h3 class="saved-card-title">' + (signedIn ? "Signed in" : "Not signed in") + '</h3>' +
       '<p class="saved-card-note">' + (signedIn
         ? "Your saved items sync with the server, so they open on any device you sign in on."
         : "Sign in to keep your saved items on the server and open them on any device.") + '</p>' +
       '<div class="saved-card-actions">' + (signedIn
         ? '<button class="btn btn--secondary" type="button" data-account-signout>Sign out</button>'
-        : '<button class="btn btn--primary" type="button" data-account-signin>Sign in</button>') + '</div>';
+        : '<button class="btn btn--primary" type="button" data-account-signin>Sign in</button>') + '</div>' +
+      '</article></section>';
   }
 
   /* ================= SAVED ================= */
@@ -1851,6 +1846,7 @@
   renderPatterns();
   renderProduct();
   renderResources();
+  renderAccount();
   renderVariables();
   renderButtons();
   renderComponents();
