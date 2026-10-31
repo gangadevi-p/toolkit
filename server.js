@@ -138,9 +138,11 @@ app.put("/api/saved", express.json({ limit: "2mb" }), async (req, res, next) => 
 /* Static files: only the site itself, never server.js, data/ or .git. */
 app.use("/css", express.static(path.join(__dirname, "css")));
 app.use("/js", express.static(path.join(__dirname, "js")));
-for (const icon of ["favicon.svg", "favicon-32.png", "apple-touch-icon.png"]) {
-  app.get("/" + icon, (req, res) => res.sendFile(path.join(__dirname, icon)));
+/* Icons, the app manifest and the service worker (which must be served fresh so updates reach the phone). */
+for (const file of ["favicon.svg", "favicon-32.png", "apple-touch-icon.png", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png"]) {
+  app.get("/" + file, (req, res) => res.sendFile(path.join(__dirname, file)));
 }
+app.get("/sw.js", (req, res) => { res.set("Cache-Control", "no-cache"); res.sendFile(path.join(__dirname, "sw.js")); });
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
 
 app.use((err, req, res, next) => { console.error(err); res.status(500).json({ error: "server error" }); });

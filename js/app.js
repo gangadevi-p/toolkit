@@ -1825,5 +1825,25 @@
   renderButtons();
   renderComponents();
   show(location.hash.slice(1) || "components");
+
+  /* Opened from the iPhone share sheet as /?save=<link>&title=<text>: show the save form already filled in,
+     then tidy the address so a refresh does not open it again. */
+  (function openShared() {
+    var params;
+    try { params = new URLSearchParams(location.search); } catch (err) { return; }
+    var link = (params.get("save") || params.get("url") || "").trim();
+    var title = (params.get("title") || params.get("text") || "").trim();
+    if (!link && !title) return;
+    try { history.replaceState(null, "", location.pathname + location.hash); } catch (err) {}
+    if (link && !normalizeLink(link)) { title = title ? title + " " + link : link; link = ""; }
+    openSaveDialog();
+    $("save-link").value = link;
+    $("save-title").value = title;
+  })();
+
   initSync();
+
+  if ("serviceWorker" in navigator && location.protocol !== "file:") {
+    navigator.serviceWorker.register("sw.js").catch(function () {});
+  }
 })();
