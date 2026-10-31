@@ -1909,10 +1909,25 @@
     return String(text || "").replace(/[\u2018\u2019]/g, "'").replace(/\s+/g, " ").trim().toLowerCase();
   }
 
+  var EX_ICONS = {
+    spark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 3l1.9 5.1L18 10l-5.1 1.9L11 17l-1.9-5.1L4 10l5.1-1.9z"/><path d="M19 15l.8 2.2 2.2.8-2.2.8L19 21l-.8-2.2-2.2-.8 2.2-.8z"/></svg>',
+    idea: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.8 10.6c.8.7 1.3 1.6 1.3 2.4h5c0-.8.5-1.7 1.3-2.4A6 6 0 0 0 12 3z"/></svg>',
+    clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg>',
+    star: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8L3.5 9.7l5.9-.8z"/></svg>'
+  };
+
+  function explainHeading(text) {
+    return '<p class="explain-heading"><span class="explain-spark">' + EX_ICONS.spark + '</span><span>' + esc(text) + '</span></p>';
+  }
+
   function explainList(e, isGroup) {
-    function row(label, text) { return '<div><dt>' + label + '</dt><dd>' + esc(text) + '</dd></div>'; }
+    function row(kind, label, icon, text) {
+      return '<div class="ex-' + kind + '"><span class="ex-icon">' + icon + '</span><dt>' + label + '</dt><dd>' + esc(text) + '</dd></div>';
+    }
     return '<dl class="explain' + (isGroup ? ' explain--group' : '') + '">' +
-      row("Definition", e[1]) + row("When to use", e[2]) + row("Why use it", e[3]) + '</dl>';
+      row("def", "Definition", EX_ICONS.idea, e[1]) +
+      row("when", "When to use", EX_ICONS.clock, e[2]) +
+      row("why", "Why use it", EX_ICONS.star, e[3]) + '</dl>';
   }
 
   function applyExplainers() {
@@ -1928,7 +1943,7 @@
         header.setAttribute("data-explained", "1");
         var box = document.createElement("div");
         box.className = "explain-wrap";
-        box.innerHTML = '<p class="explain-heading">' + esc(e[0]) + '</p>' + explainList(e, true);
+        box.innerHTML = explainHeading(e[0]) + explainList(e, true);
         header.insertAdjacentElement("afterend", box);
       });
 
@@ -1941,7 +1956,7 @@
         card.classList.add("has-explainer");
         var head = title.closest(".ref-head, .component-card-head, .type-meta") ||
           (title.parentElement && title.parentElement.classList.contains("row") ? title.parentElement : title);
-        head.insertAdjacentHTML("afterend", '<p class="explain-heading">' + esc(e[0]) + '</p>');
+        head.insertAdjacentHTML("afterend", explainHeading(e[0]));
         card.insertAdjacentHTML("beforeend", explainList(e, false));
         card.setAttribute("data-name", (card.getAttribute("data-name") || "") + " " + plain(e.join(" ")));
       });
