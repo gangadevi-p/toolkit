@@ -226,8 +226,8 @@ button,a,input,select,textarea,summary,[role="button"]{touch-action:manipulation
 .account-actions .btn{height:var(--touch-min);padding:0 24px;border-radius:14px;}
 
 /* ============================================================
-   Plain-language explainers — styled like Apple's Settings:
-   coloured icon tiles, soft tinted rows, a friendly headline.
+   Plain-language explainers — Apple Settings style, in pastels.
+   The same soft colours in light and dark mode, with dark ink on top.
    ============================================================ */
 .explain-heading{
   display:flex;align-items:center;gap:10px;margin:6px 0 2px;
@@ -235,9 +235,9 @@ button,a,input,select,textarea,summary,[role="button"]{touch-action:manipulation
   letter-spacing:-.018em;color:var(--text);text-wrap:balance;
 }
 .explain-spark{
-  flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:10px;color:#fff;
-  background:linear-gradient(135deg,#FF9F0A 0%,#FF375F 100%);
-  box-shadow:0 6px 16px rgba(255,95,60,.35);
+  flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:10px;color:#8A3C5E;
+  background:linear-gradient(135deg,#FFD9BF 0%,#FFC2DA 100%);
+  box-shadow:0 4px 14px rgba(255,170,200,.45);
   transition:transform .6s var(--spring);
 }
 .explain-spark svg{width:18px;height:18px;}
@@ -251,30 +251,31 @@ button,a,input,select,textarea,summary,[role="button"]{touch-action:manipulation
   margin:8px 0 0;padding:0;background:none;box-shadow:none;
 }
 .explain > div{
-  --c:#0A84FF;
+  /* pastel set: row fill, icon fill, icon glyph, label */
+  --row:#D8E9FF;--row-hover:#CBE1FF;--tile:#A9CBFF;--glyph:#1F4E8C;--label:#2A5AA3;
   display:grid;grid-template-columns:38px minmax(0,1fr);column-gap:12px;row-gap:3px;align-items:start;
   padding:14px;border-radius:20px;
-  background:color-mix(in srgb,var(--c) 12%,transparent);
-  box-shadow:inset 0 0 0 .5px color-mix(in srgb,var(--c) 22%,transparent);
+  background:var(--row);color:#1C1C1E;
+  box-shadow:inset 0 0 0 .5px rgba(0,0,0,.05);
   transition:transform .5s var(--spring),background-color .25s var(--spring-soft);
   animation:ex-in .7s var(--spring-soft) both;
 }
-.explain > .ex-when{--c:#30B455;animation-delay:.08s;}
-.explain > .ex-why{--c:#FF9F0A;animation-delay:.16s;}
+.explain > .ex-when{--row:#D7F2E1;--row-hover:#C8EBD6;--tile:#A6E0BC;--glyph:#1E6B40;--label:#2A7A4C;animation-delay:.08s;}
+.explain > .ex-why{--row:#FFEACB;--row-hover:#FFE0B3;--tile:#FFCE91;--glyph:#8A5100;--label:#9A5A00;animation-delay:.16s;}
 @keyframes ex-in{from{opacity:0;transform:translateY(12px) scale(.97);}to{opacity:1;transform:none;}}
 .ex-icon{
   grid-row:1 / span 2;display:grid;place-items:center;width:38px;height:38px;border-radius:12px;
-  background:var(--c);color:#fff;box-shadow:0 6px 14px color-mix(in srgb,var(--c) 38%,transparent);
+  background:var(--tile);color:var(--glyph);box-shadow:0 4px 12px rgba(0,0,0,.08);
   transition:transform .55s var(--spring);
 }
 .ex-icon svg{width:21px;height:21px;}
 .explain dt{
   align-self:end;font-size:12px;line-height:16px;font-weight:var(--weight-bold);letter-spacing:.07em;text-transform:uppercase;
-  color:color-mix(in srgb,var(--c) 62%,var(--text));
+  color:var(--label);
 }
-.explain dd{margin:0;font-size:15px;line-height:22px;color:var(--text);text-wrap:pretty;}
+.explain dd{margin:0;font-size:15px;line-height:22px;color:#1C1C1E;text-wrap:pretty;}
 @media (hover:hover){
-  .explain > div:hover{transform:translateY(-2px);background:color-mix(in srgb,var(--c) 17%,transparent);}
+  .explain > div:hover{transform:translateY(-2px);background:var(--row-hover);}
   .explain > div:hover .ex-icon{transform:rotate(-8deg) scale(1.1);}
 }
 /* the older, more technical one-liner is replaced by the plain-language text */
