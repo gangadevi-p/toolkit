@@ -291,7 +291,7 @@ body{background:var(--bg);}
 @media (max-width:760px){.typeface{grid-template-columns:1fr;}}
 .typeface-specimen{
   display:flex;align-items:flex-end;min-height:220px;padding:18px 22px;border-radius:var(--radius-md);
-  background:#f5f5f5;color:var(--text);
+  background:var(--accent);color:var(--on-accent);
   font-size:136px;line-height:.9;font-weight:var(--weight-bold);letter-spacing:-.03em;overflow:hidden;
 }
 .typeface-info{display:flex;flex-direction:column;gap:12px;min-width:0;}
@@ -525,7 +525,8 @@ body{background:var(--bg);}
 .filter-bar button:focus-visible{outline:2px solid var(--focus-ring);outline-offset:1px;}
 @media (prefers-reduced-motion:reduce){.filter-bar button{transition:none;}}
 .component-family{scroll-margin-top:24px;margin-bottom:48px;gap:28px;}
-.component-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px;align-items:start;}
+/* one card per row: the Definition / When to use / Why use it tiles need the width to sit side by side */
+.component-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:28px;align-items:start;}
 .component-card{gap:16px;padding:24px;}
 .component-card--span{grid-column:span 2;}
 .component-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;min-width:0;}
@@ -548,7 +549,6 @@ body{background:var(--bg);}
 .basic-empty{display:flex;flex-direction:column;align-items:center;gap:12px;font-size:var(--label-size);}
 
 @media(max-width:960px){
-  .component-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
   .component-card--span{grid-column:auto;}
   .component-family{scroll-margin-top:88px;}
 }
@@ -736,7 +736,7 @@ body{background:var(--bg);}
 }
 
 /* components: as many columns as fit comfortably, never squeezed */
-.component-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));}
+.component-grid{grid-template-columns:minmax(0,1fr);}
 .component-card{padding:24px;}
 @media (max-width:560px){
   .ref-facts > div{grid-template-columns:minmax(0,1fr);gap:2px;}

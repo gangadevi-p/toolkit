@@ -1,6 +1,6 @@
 /* Keeps the app opening when the connection is poor. Network first, so an update always wins;
    the cached copy is only used when the network fails. The saved list itself lives in the app and on the server. */
-const CACHE = "toolkit-shell-v1";
+const CACHE = "toolkit-shell-v4";
 
 self.addEventListener("install", () => self.skipWaiting());
 
