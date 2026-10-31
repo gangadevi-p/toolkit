@@ -10,6 +10,17 @@
   var I = D.ICONS;
   var $ = function (id) { return document.getElementById(id); };
 
+  /* The public GitHub Pages copy has no server, so it has no sign-in and no sync:
+     saved items stay on the visitor's own device. The Railway and localhost copies keep sign-in. */
+  var LOCAL_ONLY = /\.github\.io$/i.test(location.hostname);
+  if (LOCAL_ONLY) {
+    D.SECTIONS = D.SECTIONS.filter(function (s) { return s.id !== "account"; });
+    var accountTab = document.querySelector('.tab[data-section="account"]');
+    if (accountTab) accountTab.remove();
+    var savePrivacy = document.querySelector(".save-privacy:not(#login-intro)");
+    if (savePrivacy) savePrivacy.textContent = "Saved on this device only. Only you can see it.";
+  }
+
   var current = "typography";
   var platform = "web";
   var colorVariableMode = "light";
@@ -1257,6 +1268,7 @@
 
   /* Asks for the username and password. The saved list stays usable on this device until signed in. */
   function openLogin(message) {
+    if (LOCAL_ONLY) return;
     var dialog = $("login-dialog");
     if (dialog.open) return;
     $("login-form").reset();
@@ -1314,7 +1326,7 @@
   function pushPayload() { return { rev: serverRev, items: saved, categories: customCategories }; }
 
   function schedulePush() {
-    if (serverRev === null) return;
+    if (LOCAL_ONLY || serverRev === null) return;
     clearTimeout(pushTimer);
     pushTimer = setTimeout(pushSaved, 300);
   }
@@ -1353,6 +1365,7 @@
   }
 
   function initSync() {
+    if (LOCAL_ONLY) return;
     if (!getToken()) { openLogin(); return; }
     api("GET").then(function (res) {
       if (res.status === 401) { setToken(""); openLogin("Your session ended. Sign in again to sync."); throw new Error("Signed out"); }
