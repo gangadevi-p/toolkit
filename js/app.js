@@ -15,8 +15,6 @@
   var LOCAL_ONLY = /\.github\.io$/i.test(location.hostname);
   if (LOCAL_ONLY) {
     D.SECTIONS = D.SECTIONS.filter(function (s) { return s.id !== "account"; });
-    var accountTab = document.querySelector('.tab[data-section="account"]');
-    if (accountTab) accountTab.remove();
     var savePrivacy = document.querySelector(".save-privacy:not(#login-intro)");
     if (savePrivacy) savePrivacy.textContent = "Saved on this device only. Only you can see it.";
   }
@@ -248,7 +246,7 @@
     if (!$("page-" + id)) { id = "typography"; }
     current = id;
     D.SECTIONS.forEach(function (s) { $("page-" + s.id).hidden = s.id !== id; });
-    document.querySelectorAll(".nav-link, .topbar-saved, .tab[data-section]").forEach(function (l) {
+    document.querySelectorAll(".nav-link, .topbar-saved").forEach(function (l) {
       if (l.getAttribute("data-section") === id) { l.setAttribute("aria-current", "page"); }
       else { l.removeAttribute("aria-current"); }
     });
@@ -1418,8 +1416,6 @@
   function updateSavedCount() {
     var el = $("saved-count");
     if (el) { el.textContent = saved.length ? String(saved.length) : ""; }
-    var tabCount = $("saved-count-tab");
-    if (tabCount) { tabCount.textContent = saved.length ? String(saved.length) : ""; }
   }
 
   function countIn(category) {
@@ -1717,7 +1713,6 @@
       return;
     }
 
-    if (t.closest("[data-tab-browse]")) { setNavOpen(true); return; }
     if (t.closest("#menu-trigger")) { setNavOpen(true); $("sidebar-close").focus(); return; }
     if (t.closest("#sidebar-close") || t.closest("#scrim")) { setNavOpen(false); $("menu-trigger").focus(); return; }
 
@@ -1736,7 +1731,7 @@
       return;
     }
 
-    var navLink = t.closest(".nav-link, .topbar-saved, .tab[data-section]");
+    var navLink = t.closest(".nav-link, .topbar-saved");
     if (navLink) { show(navLink.getAttribute("data-section")); setNavOpen(false); window.scrollTo(0, 0); return; }
 
     var typographyFilterBtn = t.closest("[data-typography-filter]");
@@ -1905,7 +1900,8 @@
   renderVariables();
   renderButtons();
   renderComponents();
-  show(location.hash.slice(1) || "components");
+  /* always open on Components; a stale #resources in the address bar must not decide the landing page */
+  show("components");
 
   /* ================= PLAIN-LANGUAGE EXPLAINERS =================
      Every concept gets a heading, a definition, when to use it and why. The words live in js/explain.js. */

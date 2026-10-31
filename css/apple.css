@@ -10,7 +10,6 @@
 :root{
   --spring:cubic-bezier(.34,1.32,.64,1);
   --spring-soft:cubic-bezier(.22,1,.36,1);
-  --tabbar-h:64px;
   --safe-bottom:env(safe-area-inset-bottom,0px);
 }
 @supports (transition-timing-function:linear(0,1)){
@@ -131,50 +130,17 @@ button,a,input,select,textarea,summary,[role="button"]{touch-action:manipulation
 }
 
 /* ============================================================
-   Tab bar (phones and small tablets): a floating, translucent bar
+   Phones and small tablets: menu + search + saved on the top bar.
+   The menu opens a bottom sheet of grouped lists.
    ============================================================ */
-.tabbar{display:none;}
 @media (max-width:960px){
-  .tabbar{
-    display:flex;align-items:center;gap:2px;position:fixed;left:12px;right:12px;bottom:calc(10px + var(--safe-bottom));z-index:45;
-    height:var(--tabbar-h);padding:6px;border-radius:34px;
-    background:var(--material);backdrop-filter:saturate(200%) blur(30px);-webkit-backdrop-filter:saturate(200%) blur(30px);
-    box-shadow:0 0 0 .5px var(--hairline),0 10px 36px rgba(0,0,0,.22);
-    transition:transform .6s var(--spring-soft),opacity .3s;
-  }
-  /* typing in search: the bar steps aside */
-  body:has(.search input:focus) .tabbar,.is-nav-open .tabbar{transform:translateY(140%);opacity:0;pointer-events:none;}
-  .tab{
-    position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
-    height:100%;min-width:0;padding:0;border:0;border-radius:28px;background:transparent;color:var(--text-tertiary);
-    font-size:10.5px;font-weight:var(--weight-semibold);letter-spacing:.01em;cursor:pointer;
-    transition:background-color .3s var(--spring-soft),color .25s,transform .5s var(--spring);
-  }
-  .tab svg{width:24px;height:24px;flex:none;transition:transform .55s var(--spring);}
-  .tab[aria-current="page"]{color:var(--text);background:var(--fill-strong);}
-  .tab[aria-current="page"] svg{transform:scale(1.08);}
-  .tab:active{transform:scale(.9);}
-  .tab--add{
-    flex:0 0 52px;width:52px;height:52px;align-self:center;border-radius:50%;
-    background:var(--accent);color:var(--on-accent);box-shadow:0 6px 18px rgba(0,0,0,.28);
-  }
-  .tab--add svg{width:24px;height:24px;}
-  .tab--add span{display:none;}
-  .tab--add:active{transform:scale(.88) rotate(90deg);}
-  .tab-count{position:absolute;top:4px;right:calc(50% - 22px);min-width:16px;padding:0 4px;border-radius:var(--radius-full);background:var(--text);color:var(--bg);font-size:10px;line-height:16px;text-align:center;font-variant-numeric:tabular-nums;}
-  .tab-count:empty{display:none;}
-
-  /* the top bar keeps only the compact title and search; Saved, + and Browse live in the tab bar */
-  .menu-trigger,.topbar-saved,.topbar-add{display:none !important;}
-  .topbar-inner{gap:0;}
-  .topbar-title{display:flex;flex:0 1 auto;max-width:0;opacity:0;overflow:hidden;white-space:nowrap;margin-right:0;
-    transition:max-width .6s var(--spring-soft),opacity .3s var(--spring-soft),margin-right .6s var(--spring-soft);}
-  .topbar.is-title-collapsed .topbar-title{max-width:46%;opacity:1;margin-right:12px;}
-  .topbar-inner:has(.search input:focus) .topbar-title{display:flex;max-width:0;opacity:0;margin-right:0;}
+  /* the top bar is menu, search, saved: the title and the + button step aside */
+  .topbar-add,.topbar-title{display:none !important;}
+  .topbar-inner{gap:10px;}
   .search{flex:1 1 0;}
 
-  .main{padding-bottom:calc(var(--tabbar-h) + 56px + var(--safe-bottom));}
-  .save-toast{bottom:calc(var(--tabbar-h) + 28px + var(--safe-bottom));}
+  .main{padding-bottom:calc(56px + var(--safe-bottom));}
+  .save-toast{bottom:calc(28px + var(--safe-bottom));}
 
   /* the menu becomes a bottom sheet of grouped lists */
   .sidebar{
