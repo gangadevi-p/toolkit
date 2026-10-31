@@ -4,9 +4,10 @@
   "private": true,
   "description": "A Figma-ready design system reference for foundations, buttons and components.",
   "scripts": {
-    "dev": "npx --yes serve . -l 4321",
+    "dev": "node server.js",
     "stamp": "node scripts/version-assets.js",
-    "stamp:check": "node scripts/version-assets.js --check"
+    "stamp:check": "node scripts/version-assets.js --check",
+    "start": "node server.js"
   },
   "keywords": [
     "design-system",
@@ -14,5 +15,12 @@
     "components",
     "design-tokens"
   ],
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "dependencies": {
+    "express": "^5.3.0",
+    "pg": "^8.23.1"
+  },
+  "engines": {
+    "node": ">=20"
+  }
 }

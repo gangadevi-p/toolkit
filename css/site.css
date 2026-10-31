@@ -870,3 +870,24 @@ body{background:var(--bg);}
   .topbar-brand{display:flex;align-items:center;gap:10px;flex:none;}
   .sidebar-head{display:none;}
 }
+
+/* ---------- Tool guides: a Tools post written out ---------- */
+.tg-stack{display:flex;flex-direction:column;gap:30px;}
+.tool-guide{padding:32px;gap:24px;}
+.tg-head{display:flex;flex-direction:column;align-items:flex-start;gap:8px;}
+.tg-title{margin:0;font-size:var(--h2-size,28px);line-height:var(--h2-line,36px);font-weight:var(--weight-bold);letter-spacing:-.01em;overflow-wrap:anywhere;}
+.tg-by{margin:0;font-size:var(--caption-size);line-height:var(--caption-line);color:var(--text-tertiary);}
+.tg-summary{margin:0;max-width:64ch;font-size:var(--body-size);line-height:var(--body-line);color:var(--text-secondary);}
+.tg-groups{display:grid;align-items:start;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+.tg-group{display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:var(--radius-lg);background:var(--surface-sunken);min-width:0;}
+.tg-group-title{margin:0;font-size:var(--body-size);line-height:var(--body-line);font-weight:var(--weight-semibold);}
+.tg-group-note{margin:2px 0 0;font-size:var(--caption-size);line-height:var(--caption-line);color:var(--text-tertiary);}
+.tg-chips{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px;}
+.tg-chips li{padding:6px 12px;border-radius:var(--radius-full);background:var(--surface);font-size:var(--body-size);line-height:var(--body-line);font-weight:var(--weight-medium);}
+.tg-list{margin:0;display:flex;flex-direction:column;gap:10px;}
+.tg-list div{display:flex;flex-direction:column;gap:2px;}
+.tg-list dt{font-size:var(--body-size);line-height:var(--body-line);font-weight:var(--weight-semibold);}
+.tg-list dd{margin:0;font-size:var(--caption-size);line-height:var(--caption-line);color:var(--text-secondary);}
+.tg-takeaway{margin:0;padding:16px 20px;border-radius:var(--radius-lg);border-left:3px solid var(--accent);background:var(--surface-sunken);font-size:var(--body-size);line-height:var(--body-line);}
+.tg-src{margin-top:4px;}
+@media (max-width:640px){.tool-guide{padding:20px;}}

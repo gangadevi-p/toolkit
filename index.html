@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Toolkit</title>
   <meta name="description" content="Typography, colours, variables, buttons and components of the design system.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
@@ -12,7 +15,7 @@
   <link rel="stylesheet" href="css/base.css?v=142d55fd">
   <link rel="stylesheet" href="css/buttons.css?v=b035f32a">
   <link rel="stylesheet" href="css/components.css?v=168e7809">
-  <link rel="stylesheet" href="css/site.css?v=523519a2">
+  <link rel="stylesheet" href="css/site.css?v=6a0e297d">
 </head>
 <body>
   <div class="shell">
@@ -96,10 +99,31 @@
           <label class="field-label" for="save-note">Note</label>
           <textarea class="input input--textarea" id="save-note" name="note" rows="3" placeholder="Why is it worth saving?"></textarea>
         </div>
-        <p class="save-privacy">Stays in this browser only. Nobody else can see what you save.</p>
+        <p class="save-privacy">Saved to your account on the server. Only you can see it, after signing in.</p>
         <div class="dialog-actions">
           <button class="btn btn--ghost" id="save-cancel" type="button">Cancel</button>
           <button class="btn btn--primary" id="save-submit" type="submit">Save</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog class="save-dialog" id="login-dialog" aria-labelledby="login-title">
+      <form class="save-form" id="login-form" novalidate>
+        <div class="save-dialog-head">
+          <h2 class="dialog-title" id="login-title">Sign in</h2>
+        </div>
+        <p class="save-privacy" id="login-intro">Sign in to keep your saved items on the server and open them on any device.</p>
+        <div class="field">
+          <label class="field-label" for="login-username">Username</label>
+          <input class="input" id="login-username" name="username" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" required>
+        </div>
+        <div class="field">
+          <label class="field-label" for="login-password">Password</label>
+          <input class="input" id="login-password" name="password" type="password" autocomplete="current-password" required aria-describedby="login-help">
+          <span class="field-help" id="login-help" hidden></span>
+        </div>
+        <div class="dialog-actions">
+          <button class="btn btn--ghost" id="login-cancel" type="button">Not now</button>
+          <button class="btn btn--primary" id="login-submit" type="submit">Sign in</button>
         </div>
       </form>
     </dialog>
@@ -108,7 +132,7 @@
     <main class="main" id="pages"></main>
   </div>
 
-  <script src="js/data.js?v=414a8e56"></script>
-  <script src="js/app.js?v=384bf75f"></script>
+  <script src="js/data.js?v=45f4403a"></script>
+  <script src="js/app.js?v=c2ded6d5"></script>
 </body>
 </html>

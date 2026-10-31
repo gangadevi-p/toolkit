@@ -1016,6 +1016,49 @@
     document.querySelectorAll("[data-indeterminate]").forEach(function (el) { el.indeterminate = true; });
   }
 
+  /* ================= RESOURCES ================= */
+  /* A Tools post written out: what it teaches, grouped, with the Instagram post last for reference. */
+  function toolGuide(g) {
+    var text = [g.title, g.by, g.summary];
+    var groups = g.groups.map(function (grp) {
+      var body;
+      if (grp.tools) {
+        grp.tools.forEach(function (t) { text.push(t); });
+        body = '<ul class="tg-chips">' + grp.tools.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join("") + '</ul>';
+      } else {
+        grp.list.forEach(function (row) { text.push(row[0], row[1]); });
+        body = '<dl class="tg-list">' + grp.list.map(function (row) {
+          return '<div><dt>' + esc(row[0]) + '</dt><dd>' + esc(row[1]) + '</dd></div>';
+        }).join("") + '</dl>';
+      }
+      return '<section class="tg-group"><header><h4 class="tg-group-title">' + esc(grp.name) + '</h4>' +
+        (grp.note ? '<p class="tg-group-note">' + esc(grp.note) + '</p>' : "") + '</header>' + body + '</section>';
+    }).join("");
+    return '<article class="card tool-guide" data-name="' + esc(key(text)) + '">' +
+      '<header class="tg-head"><span class="badge badge--accent">' + esc(g.kicker) + '</span>' +
+        '<h3 class="tg-title">' + esc(g.title) + '</h3>' +
+        '<p class="tg-by">' + esc(g.by) + ' · ' + esc(g.date) + '</p></header>' +
+      '<p class="tg-summary">' + esc(g.summary) + '</p>' +
+      '<div class="tg-groups">' + groups + '</div>' +
+      '<p class="tg-takeaway">' + esc(g.takeaway) + '</p>' +
+      '<a class="saved-card-link tg-src" href="https://www.instagram.com/p/' + g.src + '/" target="_blank" rel="noopener noreferrer"><span>Original post on Instagram</span>' + I.arrowUpRight + '</a>' +
+    '</article>';
+  }
+
+  function renderResources() {
+    var guides = D.TOOL_GUIDES.map(function (g) { g.cat = "Tools"; return g; }).concat(D.CATEGORY_GUIDES);
+    var families = D.RESOURCE_CATEGORIES.map(function (cat) {
+      var items = guides.filter(function (g) { return g.cat === cat; });
+      return {
+        id: cat.toLowerCase().replace(/[^a-z]+/g, "-"),
+        name: cat + " \u00b7 " + items.length,
+        content: '<section class="group"><header class="group-header"><div class="group-head"><h2 class="group-title">' + esc(cat) + '</h2></div></header>' +
+          '<div class="tg-stack">' + items.map(toolGuide).join("") + '</div></section>'
+      };
+    });
+    familyPage("resources", "Resource categories", families);
+  }
+
   /* ================= SAVED ================= */
   var SAVE_KEY = "designSystemSaved";
   var CATEGORY_KEY = "designSystemCategories";
@@ -1134,8 +1177,139 @@
     if (cleaned) persistSaved();
   }
 
+  /* The browser copy is a cache; the server holds the real list. Every change updates both. */
   function persistSaved() {
     try { localStorage.setItem(SAVE_KEY, JSON.stringify(saved)); } catch (err) {}
+    markDirty(true);
+    schedulePush();
+  }
+
+  /* ---- Server sync ---- */
+  var TOKEN_KEY = "designSystemToken";
+  var DIRTY_KEY = "designSystemUnsynced";
+  var serverRev = null;
+  var pushTimer = null;
+  var pushing = false;
+  var pushAgain = false;
+
+  function getToken() { try { return localStorage.getItem(TOKEN_KEY) || ""; } catch (err) { return ""; } }
+  function setToken(t) { try { if (t) localStorage.setItem(TOKEN_KEY, t); else localStorage.removeItem(TOKEN_KEY); } catch (err) {} }
+  function isDirty() { try { return localStorage.getItem(DIRTY_KEY) === "1"; } catch (err) { return false; } }
+  function markDirty(on) { try { if (on) localStorage.setItem(DIRTY_KEY, "1"); else localStorage.removeItem(DIRTY_KEY); } catch (err) {} }
+
+  /* Asks for the username and password. The saved list stays usable on this device until signed in. */
+  function openLogin(message) {
+    var dialog = $("login-dialog");
+    if (dialog.open) return;
+    $("login-form").reset();
+    var help = $("login-help");
+    help.hidden = !message;
+    help.textContent = message || "";
+    dialog.showModal();
+    $("login-username").focus();
+  }
+
+  function submitLogin() {
+    var help = $("login-help");
+    var btn = $("login-submit");
+    var username = $("login-username").value.trim();
+    var password = $("login-password").value;
+    if (!username || !password) { help.textContent = "Enter your username and password."; help.hidden = false; return; }
+    btn.disabled = true;
+    fetch("/auth/login", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ username: username, password: password }) })
+      .then(function (res) {
+        return res.json().then(function (d) { return { ok: res.ok, data: d }; });
+      }).then(function (r) {
+        btn.disabled = false;
+        if (!r.ok) { help.textContent = r.data.error || "Could not sign in."; help.hidden = false; $("login-password").select(); return; }
+        setToken(r.data.token);
+        $("login-dialog").close();
+        initSync();
+      }).catch(function () {
+        btn.disabled = false;
+        help.textContent = "Could not reach the server.";
+        help.hidden = false;
+      });
+  }
+
+  function api(method, body) {
+    return fetch("/api/saved", {
+      method: method,
+      headers: { "Authorization": "Bearer " + getToken(), "Content-Type": "application/json" },
+      body: body ? JSON.stringify(body) : undefined
+    });
+  }
+
+  function applyServerState(data) {
+    customCategories = [];
+    (data.categories || []).forEach(function (c) { if (!findCategory(c)) customCategories.push(c); });
+    saved = data.items || [];
+    saved.forEach(function (it) { if (!findCategory(it.category)) customCategories.push(it.category); });
+    try {
+      localStorage.setItem(SAVE_KEY, JSON.stringify(saved));
+      localStorage.setItem(CATEGORY_KEY, JSON.stringify(customCategories));
+    } catch (err) {}
+    renderSaved();
+    applyFilter();
+  }
+
+  function pushPayload() { return { rev: serverRev, items: saved, categories: customCategories }; }
+
+  function schedulePush() {
+    if (serverRev === null) return;
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(pushSaved, 300);
+  }
+
+  function pushSaved() {
+    if (pushing) { pushAgain = true; return; }
+    pushing = true;
+    api("PUT", pushPayload()).then(function (res) {
+      if (res.ok) return res.json().then(function (d) { serverRev = d.rev; markDirty(false); });
+      if (res.status === 401) { setToken(""); openLogin("Your session ended. Sign in again to sync."); return; }
+      if (res.status === 409) {
+        /* Changed somewhere else since this page loaded: take the server's list. */
+        return pullSaved().then(function () {
+          showToast(I.check + '<span>Saved list updated from another device. Please redo your last change.</span>');
+        });
+      }
+      throw new Error(String(res.status));
+    }).catch(function () {
+      showToast(I.check + '<span>Could not sync. Your changes are kept on this device.</span>');
+    }).then(function () {
+      pushing = false;
+      if (pushAgain) { pushAgain = false; schedulePush(); }
+    });
+  }
+
+  function pullSaved() {
+    return api("GET").then(function (res) {
+      if (res.status === 401) { setToken(""); openLogin("Your session ended. Sign in again to sync."); throw new Error("401"); }
+      if (!res.ok) throw new Error(String(res.status));
+      return res.json();
+    }).then(function (d) {
+      serverRev = d.rev;
+      markDirty(false);
+      applyServerState(d);
+    });
+  }
+
+  function initSync() {
+    if (!getToken()) { openLogin(); return; }
+    api("GET").then(function (res) {
+      if (res.status === 401) { setToken(""); openLogin("Your session ended. Sign in again to sync."); throw new Error("Signed out"); }
+      if (!res.ok) throw new Error(String(res.status));
+      return res.json();
+    }).then(function (d) {
+      serverRev = d.rev;
+      var serverEmpty = !d.items.length && !d.categories.length;
+      /* First run on a new server, or unsynced edits made offline: this device's list wins. */
+      if ((serverEmpty && (saved.length || customCategories.length)) || isDirty()) { pushSaved(); }
+      else { applyServerState(d); }
+    }).catch(function (err) {
+      if (err.message === "Signed out") return;
+      showToast(I.check + '<span>Could not reach the server. Using the copy on this device.</span>');
+    });
   }
 
   function renderSaveForm(selected) {
@@ -1369,6 +1543,7 @@
   }
 
   document.addEventListener("submit", function (e) {
+    if (e.target.id === "login-form") { e.preventDefault(); submitLogin(); return; }
     if (e.target.id === "save-form") { e.preventDefault(); submitSave(); return; }
     if (e.target.hasAttribute("data-saved-linkform")) { e.preventDefault(); submitLink(e.target); }
   });
@@ -1450,6 +1625,8 @@
       }
       return;
     }
+
+    if (t.closest("#login-cancel")) { $("login-dialog").close(); return; }
 
     var savedDelete = t.closest("[data-saved-delete]");
     if (savedDelete) {
@@ -1643,8 +1820,10 @@
   renderResearch();
   renderPatterns();
   renderProduct();
+  renderResources();
   renderVariables();
   renderButtons();
   renderComponents();
   show(location.hash.slice(1) || "components");
+  initSync();
 })();
