@@ -1056,7 +1056,28 @@
           '<div class="tg-stack">' + items.map(toolGuide).join("") + '</div></section>'
       };
     });
+    families.push({
+      id: "account",
+      name: "Account",
+      content: '<section class="group"><header class="group-header"><div class="group-head"><h2 class="group-title">Account</h2></div></header>' +
+        '<article class="card saved-card"><div id="account-box"></div></article></section>'
+    });
     familyPage("resources", "Resource categories", families);
+    renderAccount();
+  }
+
+  /* Shows whether this device is signed in, with the button to sign in or out. */
+  function renderAccount() {
+    var box = $("account-box");
+    if (!box) return;
+    var signedIn = !!getToken();
+    box.innerHTML = '<h3 class="saved-card-title">' + (signedIn ? "Signed in" : "Not signed in") + '</h3>' +
+      '<p class="saved-card-note">' + (signedIn
+        ? "Your saved items sync with the server, so they open on any device you sign in on."
+        : "Sign in to keep your saved items on the server and open them on any device.") + '</p>' +
+      '<div class="saved-card-actions">' + (signedIn
+        ? '<button class="btn btn--secondary" type="button" data-account-signout>Sign out</button>'
+        : '<button class="btn btn--primary" type="button" data-account-signin>Sign in</button>') + '</div>';
   }
 
   /* ================= SAVED ================= */
@@ -1193,7 +1214,10 @@
   var pushAgain = false;
 
   function getToken() { try { return localStorage.getItem(TOKEN_KEY) || ""; } catch (err) { return ""; } }
-  function setToken(t) { try { if (t) localStorage.setItem(TOKEN_KEY, t); else localStorage.removeItem(TOKEN_KEY); } catch (err) {} }
+  function setToken(t) {
+    try { if (t) localStorage.setItem(TOKEN_KEY, t); else localStorage.removeItem(TOKEN_KEY); } catch (err) {}
+    renderAccount();
+  }
   function isDirty() { try { return localStorage.getItem(DIRTY_KEY) === "1"; } catch (err) { return false; } }
   function markDirty(on) { try { if (on) localStorage.setItem(DIRTY_KEY, "1"); else localStorage.removeItem(DIRTY_KEY); } catch (err) {} }
 
@@ -1627,6 +1651,12 @@
     }
 
     if (t.closest("#login-cancel")) { $("login-dialog").close(); return; }
+    if (t.closest("[data-account-signin]")) { openLogin(); return; }
+    if (t.closest("[data-account-signout]")) {
+      setToken("");
+      showToast(I.check + '<span>Signed out. Your saved items stay on this device until you sign in again.</span>');
+      return;
+    }
 
     var savedDelete = t.closest("[data-saved-delete]");
     if (savedDelete) {
