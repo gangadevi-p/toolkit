@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta name="color-scheme" content="light dark">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Toolkit</title>
   <meta name="description" content="Typography, colours, variables, buttons and components of the design system.">
@@ -15,14 +16,12 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Toolkit">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
-  <link rel="stylesheet" href="css/tokens.css?v=9e4bb1c0">
+  <link rel="stylesheet" href="css/tokens.css?v=535d6a5b">
   <link rel="stylesheet" href="css/base.css?v=142d55fd">
   <link rel="stylesheet" href="css/buttons.css?v=b035f32a">
   <link rel="stylesheet" href="css/components.css?v=168e7809">
   <link rel="stylesheet" href="css/site.css?v=6a0e297d">
+  <link rel="stylesheet" href="css/apple.css?v=4fea439c">
 </head>
 <body>
   <div class="shell">
@@ -71,6 +70,28 @@
       <nav class="nav" id="nav" aria-label="Sections"></nav>
     </aside>
     <div class="scrim" id="scrim"></div>
+    <nav class="tabbar" aria-label="Tabs">
+      <button class="tab" type="button" data-tab-browse aria-haspopup="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg>
+        <span>Browse</span>
+      </button>
+      <button class="tab" type="button" data-section="resources">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h6a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4z"/><path d="M20 5h-6a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h6z"/></svg>
+        <span>Resources</span>
+      </button>
+      <button class="tab tab--add" type="button" data-save-open aria-haspopup="dialog" aria-label="Save here">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+        <span>Save</span>
+      </button>
+      <button class="tab" type="button" data-section="saved">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4h10v16l-5-4-5 4z"/></svg>
+        <span>Saved</span><span class="tab-count" id="saved-count-tab"></span>
+      </button>
+      <button class="tab" type="button" data-section="account">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+        <span>Account</span>
+      </button>
+    </nav>
 
     <dialog class="save-dialog" id="save-dialog" aria-labelledby="save-dialog-title">
       <form class="save-form" id="save-form" novalidate>
@@ -139,7 +160,7 @@
     <main class="main" id="pages"></main>
   </div>
 
-  <script src="js/data.js?v=f0e7ef78"></script>
-  <script src="js/app.js?v=c159ed3c"></script>
+  <script src="js/data.js?v=6909a9ba"></script>
+  <script src="js/app.js?v=e86ebd3e"></script>
 </body>
 </html>

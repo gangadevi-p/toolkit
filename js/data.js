@@ -90,7 +90,7 @@
 
   /* ================= TYPOGRAPHY ================= */
   var TYPEFACE = {
-    name: "Poppins",
+    name: "SF Pro",
     weights: [
       { value: 400, name: "Regular" },
       { value: 500, name: "Medium" },

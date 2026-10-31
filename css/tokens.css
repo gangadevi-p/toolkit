@@ -47,7 +47,7 @@
   --danger-200:#e5e5e5;
 
   /* ---------- typeface ---------- */
-  --font:'Poppins',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font:-apple-system,BlinkMacSystemFont,'SF Pro Text','SF Pro Display','Helvetica Neue',system-ui,'Segoe UI',Roboto,sans-serif;
   --weight-regular:400;
   --weight-medium:500;
   --weight-semibold:600;

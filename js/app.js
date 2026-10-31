@@ -195,12 +195,49 @@
     page.querySelector(".empty").hidden = shown !== 0 || total === 0;
   }
 
+  /* The large page title folds into the top bar once it scrolls away, as in iOS. */
+  var titleObserver = null;
+  function watchTitle() {
+    var bar = document.querySelector(".topbar");
+    if (titleObserver) titleObserver.disconnect();
+    bar.classList.remove("is-title-collapsed");
+    var title = document.querySelector("#page-" + current + " .page-title");
+    if (!title || !("IntersectionObserver" in window)) return;
+    titleObserver = new IntersectionObserver(function (entries) {
+      var e = entries[0];
+      bar.classList.toggle("is-title-collapsed", !e.isIntersecting && e.boundingClientRect.top < 0);
+    }, { rootMargin: "-72px 0px 0px 0px" });
+    titleObserver.observe(title);
+  }
+
+  /* Segmented controls: one thumb that slides to the chosen segment. */
+  function syncThumbs() {
+    document.querySelectorAll(".filter-bar").forEach(function (bar) {
+      if (!bar.offsetWidth) return;
+      var on = bar.querySelector('button[aria-pressed="true"]');
+      var thumb = bar.querySelector(".seg-thumb");
+      if (!on) { if (thumb) thumb.remove(); bar.classList.remove("has-thumb"); return; }
+      if (!thumb) {
+        thumb = document.createElement("i");
+        thumb.className = "seg-thumb no-anim";
+        thumb.setAttribute("aria-hidden", "true");
+        bar.insertBefore(thumb, bar.firstChild);
+      }
+      thumb.style.setProperty("--x", on.offsetLeft + "px");
+      thumb.style.setProperty("--w", on.offsetWidth + "px");
+      bar.classList.add("has-thumb");
+      if (thumb.classList.contains("no-anim")) {
+        requestAnimationFrame(function () { requestAnimationFrame(function () { thumb.classList.remove("no-anim"); }); });
+      }
+    });
+  }
+
   function show(id) {
     if (id === "product") { id = "prioritisation"; }
     if (!$("page-" + id)) { id = "typography"; }
     current = id;
     D.SECTIONS.forEach(function (s) { $("page-" + s.id).hidden = s.id !== id; });
-    document.querySelectorAll(".nav-link, .topbar-saved").forEach(function (l) {
+    document.querySelectorAll(".nav-link, .topbar-saved, .tab[data-section]").forEach(function (l) {
       if (l.getAttribute("data-section") === id) { l.setAttribute("aria-current", "page"); }
       else { l.removeAttribute("aria-current"); }
     });
@@ -210,6 +247,8 @@
     if (location.hash !== "#" + id) { history.replaceState(null, "", "#" + id); }
     try { localStorage.setItem("designSystemSection", id); } catch (err) {}
     applyFilter();
+    watchTitle();
+    syncThumbs();
   }
 
   /* ================= TYPOGRAPHY ================= */
@@ -1069,7 +1108,7 @@
       '<p class="saved-card-note">' + (signedIn
         ? "Your saved items sync with the server, so they open on any device you sign in on."
         : "Sign in to keep your saved items on the server and open them on any device.") + '</p>' +
-      '<div class="saved-card-actions">' + (signedIn
+      '<div class="account-actions">' + (signedIn
         ? '<button class="btn btn--secondary" type="button" data-account-signout>Sign out</button>'
         : '<button class="btn btn--primary" type="button" data-account-signin>Sign in</button>') + '</div>' +
       '</article></section>';
@@ -1366,6 +1405,8 @@
   function updateSavedCount() {
     var el = $("saved-count");
     if (el) { el.textContent = saved.length ? String(saved.length) : ""; }
+    var tabCount = $("saved-count-tab");
+    if (tabCount) { tabCount.textContent = saved.length ? String(saved.length) : ""; }
   }
 
   function countIn(category) {
@@ -1590,7 +1631,7 @@
   document.addEventListener("click", function (e) {
     var t = e.target;
 
-    if (t.closest("#save-open")) { openSaveDialog(); return; }
+    if (t.closest("#save-open, [data-save-open]")) { openSaveDialog(); return; }
     if (t.closest("#save-close") || t.closest("#save-cancel")) { closeSaveDialog(); return; }
     if (t.id === "save-dialog") {
       var box = t.getBoundingClientRect();
@@ -1663,6 +1704,7 @@
       return;
     }
 
+    if (t.closest("[data-tab-browse]")) { setNavOpen(true); return; }
     if (t.closest("#menu-trigger")) { setNavOpen(true); $("sidebar-close").focus(); return; }
     if (t.closest("#sidebar-close") || t.closest("#scrim")) { setNavOpen(false); $("menu-trigger").focus(); return; }
 
@@ -1681,7 +1723,7 @@
       return;
     }
 
-    var navLink = t.closest(".nav-link, .topbar-saved");
+    var navLink = t.closest(".nav-link, .topbar-saved, .tab[data-section]");
     if (navLink) { show(navLink.getAttribute("data-section")); setNavOpen(false); window.scrollTo(0, 0); return; }
 
     var typographyFilterBtn = t.closest("[data-typography-filter]");
@@ -1851,6 +1893,15 @@
   renderButtons();
   renderComponents();
   show(location.hash.slice(1) || "components");
+
+  var thumbFrame = 0;
+  new MutationObserver(function () {
+    if (thumbFrame) return;
+    thumbFrame = requestAnimationFrame(function () { thumbFrame = 0; syncThumbs(); });
+  }).observe($("pages"), { subtree: true, childList: true, attributes: true, attributeFilter: ["aria-pressed", "hidden"] });
+  window.addEventListener("resize", syncThumbs);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncThumbs);
+  syncThumbs();
 
   /* Opened from the iPhone share sheet as /?save=<link>&title=<text>: show the save form already filled in,
      then tidy the address so a refresh does not open it again. */
