@@ -147,4 +147,4 @@ app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
 
 app.use((err, req, res, next) => { console.error(err); res.status(500).json({ error: "server error" }); });
 
-store.init().then(() => app.listen(PORT, () => console.log("Toolkit on :" + PORT + (USER && PASSWORD ? "" : " (APP_USER / APP_PASSWORD not set: sign-in is disabled)"))));
+store.init().then(() => app.listen(PORT, () => console.log("Designer Toolkit on :" + PORT + (USER && PASSWORD ? "" : " (APP_USER / APP_PASSWORD not set: sign-in is disabled)"))));

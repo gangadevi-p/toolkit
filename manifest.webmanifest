@@ -1,6 +1,6 @@
 {
-  "name": "Toolkit",
-  "short_name": "Toolkit",
+  "name": "Designer Toolkit",
+  "short_name": "Designer Toolkit",
   "description": "Design reference, plus a place to save what you find online.",
   "start_url": "./",
   "scope": "./",

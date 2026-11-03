@@ -517,7 +517,7 @@
           ["Colours", "The palette and its roles."], ["Typography", "Typefaces, sizes and weights."],
           ["Spacing", "A consistent spacing scale."], ["Shadows", "Elevation values."], ["Animations", "Timing and easing."] ] }
       ],
-      takeaway: "Then feed the system to Claude. It is the same idea as this Toolkit: the Variables page lists these values." },
+      takeaway: "Then feed the system to Claude. It is the same idea as this Designer Toolkit: the Variables page lists these values." },
 
     { id: "adobe-free", kicker: "Free tools", title: "A free, open replacement for Adobe",
       by: "Zack Shutt", date: "Oct 2026", src: "DePjlUmEb4_",
@@ -3364,7 +3364,7 @@
         ]
       }
     ],
-    "takeaway": "Start with foundations and tokens, ship five components, and give the system an owner. This Toolkit's Variables page follows the same primitive-to-semantic idea."
+    "takeaway": "Start with foundations and tokens, ship five components, and give the system an owner. This Designer Toolkit's Variables page follows the same primitive-to-semantic idea."
   },
   {
     "cat": "UI & UX",
